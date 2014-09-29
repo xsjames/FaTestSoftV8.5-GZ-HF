@@ -1,0 +1,805 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading;
+
+using System.Windows.Forms;
+using KD.WinFormsUI.Docking;
+using FaTestSoft.CommonData;
+
+namespace FaTestSoft
+{
+    public partial class OutputWindows :DockContent
+    {
+       
+
+
+        public OutputWindows()
+        {
+            InitializeComponent();
+          
+            
+        }
+        int mymin, initmin;
+        static int Type;
+        static string Msg = @"";
+        static string DataInfo = @"";
+        static int index = 17;
+        int Pos = 0;
+        int    data =0;
+        float  fdata = 0.0F;
+        byte[] bytes = new byte[4];
+        /// <summary>
+        ///  定时器的处理函数
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+    //=====================================================================监视部分显示
+            if (PublicDataClass._MnitorParam.TcpLinkState == true)
+            {
+                PublicDataClass._MnitorParam.TcpLinkState = false;
+
+                Msg = @"";
+                Msg += DateTime.Now.ToString() + " ";
+                if(PublicDataClass._MnitorParam.TcpLinkType == 0)
+                    Msg += "监视端口 [" + PublicDataClass._MnitorParam.MnitorIP + "：" + PublicDataClass._MnitorParam.MnitorPort + "]已断开";
+                else if (PublicDataClass._MnitorParam.TcpLinkType == 1)
+                    Msg +=  "监视端口 [" + PublicDataClass._MnitorParam.MnitorIP + "：" + PublicDataClass._MnitorParam.MnitorPort + "连接中...";
+                else if (PublicDataClass.TcpLinkType == 2)
+                    Msg += "监视端口 [" + PublicDataClass._MnitorParam.MnitorIP + "：" + PublicDataClass._MnitorParam.MnitorPort + "]已接通";
+                Msg += "\r\n";
+                richTextBoxExtended1.LinkMessage(Msg);
+
+            }
+            if (PublicDataClass._MnitorParam.NetShowRecvMonitorData == true)
+            {
+                PublicDataClass._MnitorParam.NetShowRecvMonitorData = false;
+                Msg = @"";
+                Msg += DateTime.Now.ToString() + " " + "<<-- ";
+                //Msg += "[" + PublicDataClass.IPADDR + "：" + PublicDataClass.PORT + "]" + "Recv：" + "(" + PublicDataClass.RevNetFrameMsg + ")";
+
+
+                for (int i = 0; i < PublicDataClass._MnitorParam.NetRLen; i++)
+                {
+                    Msg += String.Format("{0:x2}", PublicDataClass._MnitorParam.NetRBuffer[i]);
+                    Msg += " ";
+                }
+                Msg += "\r\n";
+                richTextBoxExtended1.LogMessage(Msg);
+            }
+
+
+
+    //=====================================================================
+            if (PublicDataClass._Message.ComShowSendTextData == true )
+            {
+                    PublicDataClass._Message.ComShowSendTextData = false;
+              
+                    Msg = @"";
+                    Msg += DateTime.Now.ToString() + " ";
+   
+
+                        Msg += "[" + PublicDataClass.COMID + "]" + "Send："+ "(" + PublicDataClass.ComFrameMsg + ")";
+                               
+                        for (int i = 0; i < PublicDataClass._ComStructData.TxLen; i++)
+                        {
+                            Msg += String.Format("{0:x2}", PublicDataClass._ComStructData.TXBuffer[i]);
+                            Msg += " ";
+                        }
+                        Msg += "\r\n";
+                        richTextBoxExtended1.LogMessage(Msg);
+                
+           
+            }
+            else if (PublicDataClass._Message.ComShowRecvTextData == true)                               //串口收
+            {
+
+                        Msg = @"";
+                        Msg += DateTime.Now.ToString() + " ";
+                        PublicDataClass._Message.ComShowRecvTextData = false;
+                        if (PublicDataClass.ComFrameMsg == "遥信")
+                            index = 14;
+                        else if (PublicDataClass.ComFrameMsg == "遥测")
+                            //index = 18;
+                            index = 15;
+                        else if (PublicDataClass.ComFrameMsg == "浮点遥测")
+                            //index = 19;
+                            index = 17;
+
+
+                        Msg += "[" + PublicDataClass.COMID + "]" + "Recv："+ "(" + PublicDataClass.ComFrameMsg + ")";
+                               
+                        for (int i = 0; i < PublicDataClass._ComStructData.RxLen; i++)
+                        {
+                            Msg += String.Format("{0:x2}", PublicDataClass._ComStructData.RXBuffer[i]);
+                            Msg += " ";
+
+                            if (PublicDataClass.ComFrameMsg == "遥信" && i ==index)   //index =14
+                            {
+                                Pos  = PublicDataClass._DataField.Buffer[index - 14] + (PublicDataClass._DataField.Buffer[index - 13] << 8);
+                                data = PublicDataClass._DataField.Buffer[index - 12];
+                                if(data ==0x00)
+                                    Msg += "<" + String.Format("{0:d}", Pos-1) + "：分>" + " ";
+                                else
+                                    Msg += "<" + String.Format("{0:d}", Pos-1) + "：合>" + " ";
+
+                                index += 3;
+                                
+                            }
+                            else if (PublicDataClass.ComFrameMsg == "遥测" && i==index)  //index =15 zxl
+                            {
+                                Pos  = PublicDataClass._DataField.Buffer[index - 15] + (PublicDataClass._DataField.Buffer[index - 14] << 8);
+                                data = PublicDataClass._DataField.Buffer[index - 13] + (PublicDataClass._DataField.Buffer[index - 12] << 8);
+                                if (data > 0x8000)
+                                    data = data - 65536;
+                                Msg += "<" + String.Format("{0:d}", Pos - 16385) + "：" + String.Format("{0:d}", data) + ">" + " ";
+                                index += 4;
+                            }
+                            else if (PublicDataClass.ComFrameMsg == "浮点遥测" && i == index)  //index =17 zxl
+                            {
+
+                                Pos = PublicDataClass._DataField.Buffer[index - 17] + (PublicDataClass._DataField.Buffer[index - 16] << 8);
+                
+                                    bytes[0] = PublicDataClass._DataField.Buffer[index - 15];
+                                    bytes[1] = PublicDataClass._DataField.Buffer[index - 14];
+                                    bytes[2] = PublicDataClass._DataField.Buffer[index - 13];
+                                    bytes[3] = PublicDataClass._DataField.Buffer[index - 12];
+
+                                    fdata = BitConverter.ToSingle(bytes, 0);
+                                    Msg += "<" + String.Format("{0:d}", Pos - 16385) + "：" + String.Format("{0:f4}", fdata) + ">" + " "; 
+                                    index += 6;
+                               
+                            }
+                        }
+                        
+                        if (PublicDataClass.ComFrameMsg == "无效" ||PublicDataClass.ComFrameMsg == "复位否认")     //非法帧
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.LogError(Msg);
+                        }
+                        //else if (PublicDataClass.ComFrameMsg == "应答" || PublicDataClass.ComFrameMsg == "时间"
+                        //     || PublicDataClass.ComFrameMsg == "总召激活" || PublicDataClass.ComFrameMsg == "总召结束"
+                        //     || PublicDataClass.ComFrameMsg == "设置(确认)" || PublicDataClass.ComFrameMsg == "版本号"
+                        //     || PublicDataClass.ComFrameMsg == "参数读取" || PublicDataClass.ComFrameMsg == "升级(应答)"
+                        //     || PublicDataClass.ComFrameMsg == "校验(应答)" || PublicDataClass.ComFrameMsg == "器件状态")     //
+                        //{
+                       else if (PublicDataClass.ComFrameMsg == "时间")
+                        {
+                            DataInfo = "";
+                            DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 1]);   //年
+                            DataInfo += "年";
+                            DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 2]);  //月
+                            DataInfo += "月";
+                            DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 3] & 0x1f);  //日+星期
+                            DataInfo += "日";
+                            DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 4]);  //时
+                            DataInfo += "时";
+                            DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 5]);  //分
+                            DataInfo += "分";
+                            int ms = (PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 6] << 8) +
+                                  PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 7];
+
+                            DataInfo += String.Format("{0:d}", ms);
+                            DataInfo += "毫秒";
+                            Msg += "<" + DataInfo + ">" + "\r\n";
+                            richTextBoxExtended1.AckMessage(Msg);
+                        }
+                        else if (PublicDataClass.ComFrameMsg == "升级(应答)")
+                        {
+                            DataInfo = "";
+                           // if (PublicDataClass.addselect == 1 || PublicDataClass.addselect == 2 || PublicDataClass.addselect == 3 || PublicDataClass.addselect == 4)
+                            //    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[14] + (PublicDataClass._DataField.Buffer[15] >> 8));
+                          //  else
+                                DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[2] + (PublicDataClass._DataField.Buffer[3] >> 8));
+                            Msg += "<第" + DataInfo + "段>" + "\r\n";
+                            richTextBoxExtended1.AckMessage(Msg);
+                            PublicDataClass._Message.CodeUpdateDoing = true;
+
+                        }
+                        else if (PublicDataClass.ComFrameMsg == "校验(应答)")
+                        {
+                           /* if (PublicDataClass._DataField.Buffer[0] == 0x55)
+                                Msg += "<校验正确>" + "\r\n";
+                            else
+                                Msg += "<校验错误>" + "\r\n";*/
+                            richTextBoxExtended1.AckMessage(Msg);
+                        }
+                        else if (PublicDataClass.ComFrameMsg == "设置(确认)")
+                        {
+                            Msg += "\r\n"; richTextBoxExtended1.AckMessage(Msg);
+                            PublicDataClass._Message.ParamAck = true;
+
+
+                        }          
+                    //}
+                        else if (PublicDataClass.ComFrameMsg == "设置(否认)")
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.LogError(Msg);
+                        }
+                        else if (PublicDataClass.ComFrameMsg == "遥测" || PublicDataClass.ComFrameMsg == "遥信" || PublicDataClass.ComFrameMsg == "浮点遥测")     //
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.ThreeYMessage(Msg);
+                            PublicDataClass._Message.RealTimeDataDocmentView = true;    //zxl
+                        }
+                        else if (PublicDataClass.ComFrameMsg == "选择应答" || PublicDataClass.ComFrameMsg == "执行成功")     //
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.YkAckMessage(Msg);
+                        }
+                        else if (PublicDataClass.ComFrameMsg == "遥控撤销(否认)")     //
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.YkStopMessage(Msg);
+                        }
+                        else if (PublicDataClass.ComFrameMsg == "历史数据")
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.AckMessage(Msg);
+
+                        }
+                    else
+                    {
+                        Msg += "\r\n"; richTextBoxExtended1.AckMessage(Msg);
+                    }
+             }
+
+            else if (PublicDataClass._Message.NetShowSendTextData == true)
+            {
+                        PublicDataClass._Message.NetShowSendTextData = false;
+                        Msg = @"";
+                        Msg += DateTime.Now.ToString() + " ";
+                        Msg += "[" + PublicDataClass.IPADDR + "：" + PublicDataClass.PORT + "]" + "Send："+ "(" + PublicDataClass.SedNetFrameMsg + ")";
+                               
+                        for (int i = 0; i < PublicDataClass._NetStructData.NetTLen; i++)
+                        {
+                            Msg += String.Format("{0:x2}", PublicDataClass._NetStructData.NetTBuffer[i]);
+                            Msg += " ";
+                        }
+                        Msg += "\r\n";
+                        richTextBoxExtended1.LogMessage(Msg);
+                        PublicDataClass._Message.NetShowSendOver = false;
+                    /*if (SaveTextFlag == true)
+                    {
+
+                        string data = @"";
+                        saveday = Convert.ToString(DateTime.Now.Day);
+                        if (saveday != myday)
+                        {
+                            //this.richTextBox1.Clear();
+                            myday = saveday;
+                        }
+                        Savepath = FileNamePath;
+                        data = Convert.ToString(DateTime.Now.Year) + "-" + Convert.ToString(DateTime.Now.Month) + "-" + Convert.ToString(DateTime.Now.Day);
+                        data += ".txt";
+                        Savepath += "\\" + data;
+                        //richTextBox1.SaveFile(Savepath, RichTextBoxStreamType.PlainText);
+                        Savepath = "";
+
+
+                    }*/
+               
+            }
+
+            else if(PublicDataClass._Message.NetShowRecvTextData == true)
+            {
+                       PublicDataClass._Message.NetShowRecvTextData = false;
+      
+                      if(PublicDataClass.DataTy ==18 ||PublicDataClass.DataTy ==5)
+                            index = 19;
+                       if (PublicDataClass.DataTy == 8 || PublicDataClass.DataTy == 17)
+                            index = 15;
+                       if (PublicDataClass.DataTy == 21)
+                            index = 22;
+
+                        Msg = @""; 
+                        Msg += DateTime.Now.ToString() + " ";
+                        Msg += "[" + PublicDataClass.IPADDR + "：" + PublicDataClass.PORT + "]" + "Recv："+ "(" + PublicDataClass.RevNetFrameMsg + ")";
+                                
+
+                        for (int i = 0; i < PublicDataClass._NetStructData.NetRLen; i++)
+                        {
+                            Msg += String.Format("{0:x2}", PublicDataClass._NetStructData.NetRBuffer[i]);
+
+
+                            if ((PublicDataClass.RevNetFrameMsg == "遥信") && (i == index))
+                            {
+                                if (i == 15)
+                                {
+
+                                    Pos = PublicDataClass._DataField.Buffer[2];
+                                    Pos = Pos << 16;
+                                    Pos += PublicDataClass._DataField.Buffer[0] + (PublicDataClass._DataField.Buffer[1] << 8);
+
+                                    if (PublicDataClass._NetStructData.NetRBuffer[i] == 0x00)
+                                        Msg += "<" + String.Format("{0:d}", Pos - 1) + "：分>" + " ";
+                                    else
+                                        Msg += "<" + String.Format("{0:d}", Pos - 1) + "：合>" + " ";
+                                }
+                                else
+                                {
+
+                                    if (PublicDataClass._NetStructData.NetRBuffer[i] == 0x00)
+                                        Msg += "<" + String.Format("{0:d}", Pos - 1) + "：分>" + " ";
+                                    else
+                                        Msg += "<" + String.Format("{0:d}", Pos - 1) + "：合>" + " ";
+
+                                }
+                                index += 1;
+                                Pos++;
+
+
+
+                            }
+                            else if ((PublicDataClass.RevNetFrameMsg == "遥测") && (i == index))
+                            {
+                                if (i == 19)
+                                {
+                                    Pos = PublicDataClass._DataField.Buffer[2];
+                                    Pos = Pos << 16;
+                                    Pos += PublicDataClass._DataField.Buffer[0] + (PublicDataClass._DataField.Buffer[1] << 8);
+                                    //data = PublicDataClass._DataField.Buffer[index - 12];
+                                    //data = data << 16;
+                                    /*data = PublicDataClass._DataField.Buffer[index - 14] + (PublicDataClass._DataField.Buffer[index - 13] << 8);
+                                    if (data > 0x8000)
+                                        data = data - 65536;*/
+
+                                    
+                                    bytes[0] = PublicDataClass._DataField.Buffer[index - 16];
+                                    bytes[1] = PublicDataClass._DataField.Buffer[index - 15];
+                                    bytes[2] = PublicDataClass._DataField.Buffer[index - 14];
+                                    bytes[3] = PublicDataClass._DataField.Buffer[index - 13];
+                                    
+                                    fdata =BitConverter.ToSingle(bytes, 0);
+
+
+                                    Msg += "<" + String.Format("{0:d}", Pos - 16385) + "：" + String.Format("{0:f4}", fdata) + ">" + " ";
+                                }
+                                else
+                                {
+                                    //data = PublicDataClass._DataField.Buffer[index - 12];
+                                    //data = data << 16;
+                                    /*data =PublicDataClass._DataField.Buffer[index - 14] + (PublicDataClass._DataField.Buffer[index - 13] << 8);
+                                    if (data > 0x8000)
+                                        data = data - 65536;*/
+
+                                    bytes[0] = PublicDataClass._DataField.Buffer[index - 16];
+                                    bytes[1] = PublicDataClass._DataField.Buffer[index - 15];
+                                    bytes[2] = PublicDataClass._DataField.Buffer[index - 14];
+                                    bytes[3] = PublicDataClass._DataField.Buffer[index - 13];
+
+                                    fdata = BitConverter.ToSingle(bytes, 0);
+                                    Msg += "<" + String.Format("{0:d}", Pos - 16385) + "：" + String.Format("{0:f4}", fdata) + ">" + " ";
+                                    
+                                    
+                                }
+                                index += 5;
+                                Pos++;
+
+
+                            }
+                            else if (PublicDataClass.DataTy == 8 && i ==index)  //不带时标遥信变位
+                            {
+
+                                Pos = PublicDataClass._DataField.Buffer[index-13];
+                                Pos = Pos << 16;
+                                Pos += PublicDataClass._DataField.Buffer[index-15] + (PublicDataClass._DataField.Buffer[index-14] << 8);
+
+                                if(PublicDataClass._DataField.Buffer[index-12] ==0)
+                                     Msg += "<" + String.Format("{0:d}", Pos) + "：分>" + " ";
+                                else
+                                     Msg += "<" + String.Format("{0:d}", Pos) + "：合>" + " ";
+                                index += 4;
+
+                            }
+                            else if (PublicDataClass.DataTy == 21 && i==index) //带时标的遥信变位
+                            {
+                                Pos = PublicDataClass._DataField.Buffer[index - 20];
+                                Pos = Pos << 16;
+                                Pos += PublicDataClass._DataField.Buffer[index - 22] + (PublicDataClass._DataField.Buffer[index - 21] << 8);
+
+                                if (PublicDataClass._DataField.Buffer[index - 19] == 0)
+                                    Msg += "<" + String.Format("{0:d}", Pos) + "：分 " ;
+                                else
+                                    Msg += "<" + String.Format("{0:d}", Pos) + "：合 ";
+
+                                DataInfo = "";
+                                DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[index - 12]);   //年
+                                DataInfo += "年";
+                                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[index - 13]);  //月
+                                DataInfo += "月";
+                                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[index - 14] & 0x1f);  //日+星期
+                                DataInfo += "日";
+                                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[index - 15]);  //时
+                                DataInfo += "时";
+                                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[index - 16]);  //分
+                                DataInfo += "分";
+                                int ms = (PublicDataClass._DataField.Buffer[index - 17] << 8) +PublicDataClass._DataField.Buffer[index - 18];
+                                      
+                                DataInfo += String.Format("{0:d}", ms);
+                                DataInfo += "毫秒" +">";
+                                Msg += DataInfo ;
+
+                                index += 11;
+
+                                
+                            }
+                            else
+                                Msg += " ";
+                        }
+
+                        if (PublicDataClass.RevNetFrameMsg == "无效" || PublicDataClass.RevNetFrameMsg == "设置(否认)" || 
+                            PublicDataClass.RevNetFrameMsg == "复位否认")     //非法帧
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.LogError(Msg);
+                        }
+                        else if (PublicDataClass.RevNetFrameMsg == "应答" || PublicDataClass.RevNetFrameMsg == "时间"
+                             || PublicDataClass.RevNetFrameMsg == "总召激活" || PublicDataClass.RevNetFrameMsg == "总召结束"
+                             || PublicDataClass.RevNetFrameMsg == "设置(确认)" || PublicDataClass.RevNetFrameMsg == "版本号"
+                             || PublicDataClass.RevNetFrameMsg == "参数读取" || PublicDataClass.RevNetFrameMsg == "升级(应答)"
+                             || PublicDataClass.RevNetFrameMsg == "校验(应答)" || PublicDataClass.RevNetFrameMsg == "器件状态")     //
+                        {
+
+
+                            if (PublicDataClass.RevNetFrameMsg == "时间")
+                            {
+                                DataInfo = "";
+                                DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 1]);   //年
+                                DataInfo += "年";
+                                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 2]);  //月
+                                DataInfo += "月";
+                                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 3] &0x1f);  //日+星期
+                                DataInfo += "日";
+
+                                DataInfo += "[星期" +String.Format("{0:d}", (PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 3] &0xe0)>>5)+"]";
+                            
+                                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 4]);  //时
+                                DataInfo += "时";
+                                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 5]);  //分
+                                DataInfo += "分";
+                                int ms = (PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 6] << 8) +
+                                      PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 7];
+
+                                DataInfo += String.Format("{0:d}", ms);
+                                DataInfo += "毫秒";
+                                Msg += "<" + DataInfo + ">" +"\r\n";
+                                
+                            }
+                            else if (PublicDataClass.RevNetFrameMsg == "升级(应答)")
+                            {
+                                DataInfo = "";
+                                if (PublicDataClass.addselect == 1 || PublicDataClass.addselect == 2 || PublicDataClass.addselect == 3 || PublicDataClass.addselect == 4)
+                                    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[14] + (PublicDataClass._DataField.Buffer[15] >> 8));
+                                else
+                                    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[0] + (PublicDataClass._DataField.Buffer[1] >> 8));
+                                Msg += "<第" + DataInfo + "段>" + "\r\n";
+                                PublicDataClass._Message.CodeUpdateDoing = true;
+                            }
+                            else if (PublicDataClass.RevNetFrameMsg == "校验(应答)")
+                            {
+                               /* if(PublicDataClass._DataField.Buffer[0] ==0x55)
+                                    Msg += "<校验正确>" + "\r\n";
+                                else
+                                    Msg += "<校验错误>" + "\r\n";*/
+
+                            }
+                            else if (PublicDataClass.RevNetFrameMsg == "设置(确认)")
+                            {
+                                 
+                                  PublicDataClass._Message.ParamAck = true;
+                            }
+                            else
+                                Msg += "\r\n";
+                                
+
+                            richTextBoxExtended1.AckMessage(Msg);
+                            
+
+                            if (PublicDataClass.DataTy == 1 && PublicDataClass._CallType.NetTy == 1)
+                                PublicDataClass._NetTaskFlag.C_IC_NA_1 = true;           //发送总召唤
+                            else if (PublicDataClass.DataTy == 4 && PublicDataClass._CallType.NetTy == 1)
+                                PublicDataClass._NetTaskFlag.Do_OKTACT = true;           //发确认帧
+                            else if (PublicDataClass.DataTy == 2 && PublicDataClass._CallType.NetTy == 1)
+                                PublicDataClass._FrameTime.T2 = 5;
+                        }
+                        else if (PublicDataClass.RevNetFrameMsg == "遥信")
+                        {
+                            
+                            
+                            Msg += "\r\n";
+                            richTextBoxExtended1.ThreeYMessage(Msg);
+                            PublicDataClass._Message.RealTimeDataDocmentView = true;
+                        }
+                        else if (PublicDataClass.RevNetFrameMsg == "遥测")     //
+                        {
+                            
+                            Msg += "\r\n";
+                            richTextBoxExtended1.ThreeYMessage(Msg);
+                            PublicDataClass._Message.RealTimeDataDocmentView = true;
+                        }
+                        else if (PublicDataClass.RevNetFrameMsg == "历史数据" || PublicDataClass.RevNetFrameMsg == "历史记录")
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.ThreeYMessage(Msg);
+                        }
+                        else if (PublicDataClass.RevNetFrameMsg == "扰动事件" || PublicDataClass.RevNetFrameMsg == "变位事件" ||
+                                 PublicDataClass.RevNetFrameMsg == "越限"     || PublicDataClass.RevNetFrameMsg == "停电事件" ||
+                                 PublicDataClass.RevNetFrameMsg == "故障事件" )     //
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.LogWarning(Msg);
+                            PublicDataClass._Message.RealTimeDataDocmentView = true;  
+                        }
+                        else if (PublicDataClass.RevNetFrameMsg == "内遥信")
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.ThreeYMessage(Msg);
+                        }
+                        else if (PublicDataClass.RevNetFrameMsg == "选择应答" || PublicDataClass.RevNetFrameMsg == "执行成功")     //
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.YkAckMessage(Msg);
+                        }
+                        else if (PublicDataClass.RevNetFrameMsg == "遥控撤销(否认)")     //
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.YkStopMessage(Msg);
+                        }
+                        else
+                        {
+                            Msg += "\r\n";
+                            richTextBoxExtended1.AckMessage(Msg);
+                        }
+                       
+                
+            }
+            else if (PublicDataClass._Message.GprsShowSendTextData == true)
+            {
+                PublicDataClass._Message.GprsShowSendTextData = false;
+                Msg = @"";
+                Msg += DateTime.Now.ToString() + " ";
+                Msg += "[" + PublicDataClass.ClientInfo + "]" + "Send[无线]：" + "(" + PublicDataClass.GprsFrameMsg + ")";
+
+                for (int i = 0; i < PublicDataClass._GprsStructData.GprsTLen; i++)
+                {
+                    Msg += String.Format("{0:x2}", PublicDataClass._GprsStructData.TBuffer[i]);
+                    Msg += " ";
+                }
+                Msg += "\r\n";
+                richTextBoxExtended1.LogMessage(Msg);
+                //PublicDataClass._Message.NetShowSendOver = false;
+
+
+            }
+            else if (PublicDataClass._Message.GprsShowRecvTextData == true)
+            {
+                PublicDataClass._Message.GprsShowRecvTextData = false;
+                Msg = @"";
+                Msg += DateTime.Now.ToString() + " ";
+                Msg += "[" + PublicDataClass.ClientInfo + "]" + "Recv[无线]：" + "(" + PublicDataClass.GprsFrameMsg + ")";
+
+                for (int i = 0; i < PublicDataClass._GprsStructData.GprsRLen; i++)
+                {
+                    Msg += String.Format("{0:x2}", PublicDataClass._GprsStructData.RBuffer[i]);
+                    Msg += " ";
+                }
+                PublicDataClass._GprsStructData.GprsRLen = 0;
+                if (PublicDataClass.GprsFrameMsg == "升级(应答)")
+                {
+
+                    
+                    DataInfo = "";
+                    if (PublicDataClass.addselect == 1 || PublicDataClass.addselect == 2 || PublicDataClass.addselect == 3 || PublicDataClass.addselect == 4)
+                    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[14] + (PublicDataClass._DataField.Buffer[15] >> 8));
+                    else
+                    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[0] + (PublicDataClass._DataField.Buffer[1] >> 8));
+                    Msg += "<第" + DataInfo + "段>" + "\r\n";
+                    richTextBoxExtended1.AckMessage(Msg);
+                    PublicDataClass._Message.CodeUpdateDoing = true;
+
+                 }
+                else if (PublicDataClass.GprsFrameMsg == "校验(应答)")
+                 {
+                    if (PublicDataClass._DataField.Buffer[0] == 0x55)
+                        Msg += "<校验正确>" + "\r\n";
+                    else
+                        Msg += "<校验错误>" + "\r\n";
+                    richTextBoxExtended1.AckMessage(Msg);
+                  }
+                 else if (PublicDataClass.GprsFrameMsg == "时间")
+                 {
+                    DataInfo = "";
+                    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 1]);   //年
+                    DataInfo += "年";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 2]);  //月
+                    DataInfo += "月";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 3] & 0x1f);  //日+星期
+                    DataInfo += "日";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 4]);  //时
+                    DataInfo += "时";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 5]);  //分
+                    DataInfo += "分";
+                    int ms = (PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 6] << 8) +
+                          PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 7];
+
+                    DataInfo += String.Format("{0:d}", ms);
+                    DataInfo += "毫秒";
+                    Msg += "<" + DataInfo + ">" + "\r\n";
+                    richTextBoxExtended1.AckMessage(Msg);
+                 }
+                else if (PublicDataClass.GprsFrameMsg == "版本号")
+                {
+                    Msg += "\r\n";
+                    richTextBoxExtended1.AckMessage(Msg);
+
+                }
+
+            }
+
+            else if (PublicDataClass._Message.UsbShowSendTextData == true)
+            {
+                PublicDataClass._Message.UsbShowSendTextData = false;
+                Msg = @"";
+                Msg += DateTime.Now.ToString() + " ";
+                Msg += "[" + PublicDataClass.ClientInfo + "]" + "Send[无线]：" + "(" + PublicDataClass.UsbFrameMsg + ")";
+
+                for (int i = 0; i < PublicDataClass._UsbStructData.UsbTLen; i++)
+                {
+                    Msg += String.Format("{0:x2}", PublicDataClass._UsbStructData.TBuffer[i]);
+                    Msg += " ";
+                }
+                Msg += "\r\n";
+                richTextBoxExtended1.LogMessage(Msg);
+                //PublicDataClass._Message.NetShowSendOver = false;
+
+
+            }
+
+            else if (PublicDataClass._Message.UsbShowRecvTextData == true)
+            {
+                PublicDataClass._Message.UsbShowRecvTextData = false;
+                Msg = @"";
+                Msg += DateTime.Now.ToString() + " ";
+                Msg += "[" + PublicDataClass.ClientInfo + "]" + "Recv[无线]：" + "(" + PublicDataClass.UsbFrameMsg + ")";
+
+                for (int i = 0; i < PublicDataClass._UsbStructData.UsbRLen; i++)
+                {
+                    Msg += String.Format("{0:x2}", PublicDataClass._UsbStructData.RBuffer[i]);
+                    Msg += " ";
+                }
+                PublicDataClass._UsbStructData.UsbRLen = 0;
+               ///////// //临时测试用////////////////////////////////////////////
+                //USB收到数据解包目前为0，无效
+                richTextBoxExtended1.AckMessage(Msg);
+////////////////////////////////////////////////////////////////////////////////////////
+                if (PublicDataClass.UsbFrameMsg == "升级(应答)")
+                {
+
+
+                    DataInfo = "";
+                    if (PublicDataClass.addselect == 1 || PublicDataClass.addselect == 2 || PublicDataClass.addselect == 3 || PublicDataClass.addselect == 4)
+                        DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[14] + (PublicDataClass._DataField.Buffer[15] >> 8));
+                    else
+                        DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[0] + (PublicDataClass._DataField.Buffer[1] >> 8));
+                    Msg += "<第" + DataInfo + "段>" + "\r\n";
+                    richTextBoxExtended1.AckMessage(Msg);
+                    PublicDataClass._Message.CodeUpdateDoing = true;
+
+                }
+                else if (PublicDataClass.UsbFrameMsg == "校验(应答)")
+                {
+                    if (PublicDataClass._DataField.Buffer[0] == 0x55)
+                        Msg += "<校验正确>" + "\r\n";
+                    else
+                        Msg += "<校验错误>" + "\r\n";
+                    richTextBoxExtended1.AckMessage(Msg);
+                }
+                else if (PublicDataClass.UsbFrameMsg == "时间")
+                {
+                    DataInfo = "";
+                    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 1]);   //年
+                    DataInfo += "年";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 2]);  //月
+                    DataInfo += "月";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 3] & 0x1f);  //日+星期
+                    DataInfo += "日";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 4]);  //时
+                    DataInfo += "时";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 5]);  //分
+                    DataInfo += "分";
+                    int ms = (PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 6] << 8) +
+                          PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen - 7];
+
+                    DataInfo += String.Format("{0:d}", ms);
+                    DataInfo += "毫秒";
+                    Msg += "<" + DataInfo + ">" + "\r\n";
+                    richTextBoxExtended1.AckMessage(Msg);
+                }
+                else if (PublicDataClass.UsbFrameMsg == "版本号")
+                {
+                    Msg += "\r\n";
+                    richTextBoxExtended1.AckMessage(Msg);
+
+                }
+
+            }
+            else if (PublicDataClass._Message.TcpLinkState == true)
+            {
+                PublicDataClass._Message.TcpLinkState = false;
+
+                Msg = @"";
+                Msg += DateTime.Now.ToString() + " ";
+                if (PublicDataClass.TcpLinkType == 1)
+                    Msg += "(信息)" + "No Link to Remote Host [" + PublicDataClass.IPADDR + "：" + PublicDataClass.PORT + "]";
+                if (PublicDataClass.TcpLinkType == 2)
+                    Msg += "(信息)" + "Link to Remote Host [" + PublicDataClass.IPADDR + "：" + PublicDataClass.PORT + "]";
+                Msg += "\r\n";
+                richTextBoxExtended1.LinkMessage(Msg);
+
+            }
+            else if (PublicDataClass._Message.GprsAcceptState == true)
+            {
+                PublicDataClass._Message.GprsAcceptState = false;
+                Msg = @"";
+                Msg += DateTime.Now.ToString() + " ";
+                Msg += "(信息--GPRS)" + "Accept to Remote Client [" + PublicDataClass.ClientInfo + "]";
+                Msg += "\r\n";
+                richTextBoxExtended1.LinkMessage(Msg);
+
+
+            }
+            else if (PublicDataClass._Message.NetShowDelayTimeMsg == true)  //超时信息
+            {
+                PublicDataClass._Message.NetShowDelayTimeMsg = false;
+                Msg = @"";
+                Msg += DateTime.Now.ToString() + " " + "(信息)" + "设备响应超时";
+                Msg += "\r\n";
+                richTextBoxExtended1.LogError(Msg);
+
+            }
+            initmin = DateTime.Now.Minute;
+            if (initmin != mymin)
+            {
+                mymin = initmin;
+                if(mymin ==1)
+                   richTextBoxExtended1.ClearText();
+            }
+        }
+        
+      
+       
+             /*SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+              saveFileDialog1.Filter = " txt files(*.txt)|*.txt|All files(*.*)|*.*";//设置文件类型 
+              saveFileDialog1.FilterIndex = 2;//设置默认文件类型显示顺序 
+              saveFileDialog1.RestoreDirectory = true;//保存对话框是否记忆上次打开的目录 
+              if (saveFileDialog1.ShowDialog() == DialogResult.OK)//点了保存按钮进入 
+              {
+                 richTextBox1.SaveFile(saveFileDialog1.FileName, RichTextBoxStreamType.PlainText);
+               }*/
+               
+        /// <summary>
+        /// 窗体初始化事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OutputWindows_Load(object sender, EventArgs e)
+        {
+            initmin = DateTime.Now.Minute;
+            mymin = initmin;
+        }
+
+        private void OutputWindows_VisibleChanged(object sender, EventArgs e)
+        {
+
+        }
+
+    }
+}

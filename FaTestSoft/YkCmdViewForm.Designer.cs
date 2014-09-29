@@ -1,0 +1,317 @@
+﻿namespace FaTestSoft
+{
+    partial class YkCmdViewForm
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.components = new System.ComponentModel.Container();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.AddMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.DeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buttoncancel = new System.Windows.Forms.Button();
+            this.buttonexe = new System.Windows.Forms.Button();
+            this.buttonselhe = new System.Windows.Forms.Button();
+            this.buttonselfen = new System.Windows.Forms.Button();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.checkBoxDco = new System.Windows.Forms.CheckBox();
+            this.checkBoxSco = new System.Windows.Forms.CheckBox();
+            this.rddping = new System.Windows.Forms.RadioButton();
+            this.rdpulse = new System.Windows.Forms.RadioButton();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.contextMenuStrip1.SuspendLayout();
+            this.splitContainer2.Panel1.SuspendLayout();
+            this.splitContainer2.Panel2.SuspendLayout();
+            this.splitContainer2.SuspendLayout();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // listView1
+            // 
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader5});
+            this.listView1.ContextMenuStrip = this.contextMenuStrip1;
+            this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.listView1.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.listView1.FullRowSelect = true;
+            this.listView1.GridLines = true;
+            this.listView1.Location = new System.Drawing.Point(0, 0);
+            this.listView1.MultiSelect = false;
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(477, 289);
+            this.listView1.TabIndex = 0;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
+            this.listView1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseClick);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "序 号";
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "名  称";
+            this.columnHeader2.Width = 243;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "起始点号";
+            this.columnHeader3.Width = 100;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "源码";
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "状态";
+            this.columnHeader5.Width = 100;
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.AddMenuItem,
+            this.DeleteMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(101, 48);
+            // 
+            // AddMenuItem
+            // 
+            this.AddMenuItem.Name = "AddMenuItem";
+            this.AddMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.AddMenuItem.Text = "增 加";
+            this.AddMenuItem.Click += new System.EventHandler(this.AddMenuItem_Click);
+            // 
+            // DeleteMenuItem
+            // 
+            this.DeleteMenuItem.Name = "DeleteMenuItem";
+            this.DeleteMenuItem.Size = new System.Drawing.Size(100, 22);
+            this.DeleteMenuItem.Text = "删 除";
+            this.DeleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
+            // 
+            // buttoncancel
+            // 
+            this.buttoncancel.Location = new System.Drawing.Point(28, 162);
+            this.buttoncancel.Name = "buttoncancel";
+            this.buttoncancel.Size = new System.Drawing.Size(93, 23);
+            this.buttoncancel.TabIndex = 3;
+            this.buttoncancel.Text = "撤    销";
+            this.buttoncancel.UseVisualStyleBackColor = true;
+            this.buttoncancel.Click += new System.EventHandler(this.buttoncancel_Click);
+            // 
+            // buttonexe
+            // 
+            this.buttonexe.Location = new System.Drawing.Point(28, 108);
+            this.buttonexe.Name = "buttonexe";
+            this.buttonexe.Size = new System.Drawing.Size(93, 23);
+            this.buttonexe.TabIndex = 2;
+            this.buttonexe.Text = "执     行";
+            this.buttonexe.UseVisualStyleBackColor = true;
+            this.buttonexe.Click += new System.EventHandler(this.buttonexe_Click);
+            // 
+            // buttonselhe
+            // 
+            this.buttonselhe.Location = new System.Drawing.Point(28, 60);
+            this.buttonselhe.Name = "buttonselhe";
+            this.buttonselhe.Size = new System.Drawing.Size(93, 23);
+            this.buttonselhe.TabIndex = 1;
+            this.buttonselhe.Text = "选择合闸";
+            this.buttonselhe.UseVisualStyleBackColor = true;
+            this.buttonselhe.Click += new System.EventHandler(this.buttonselhe_Click);
+            // 
+            // buttonselfen
+            // 
+            this.buttonselfen.Location = new System.Drawing.Point(28, 14);
+            this.buttonselfen.Name = "buttonselfen";
+            this.buttonselfen.Size = new System.Drawing.Size(93, 23);
+            this.buttonselfen.TabIndex = 0;
+            this.buttonselfen.Text = "选择分闸";
+            this.buttonselfen.UseVisualStyleBackColor = true;
+            this.buttonselfen.Click += new System.EventHandler(this.buttonselfen_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // splitContainer2
+            // 
+            this.splitContainer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer2.IsSplitterFixed = true;
+            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer2.Name = "splitContainer2";
+            this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.BackColor = System.Drawing.Color.Snow;
+            this.splitContainer2.Panel1.Controls.Add(this.checkBoxDco);
+            this.splitContainer2.Panel1.Controls.Add(this.checkBoxSco);
+            this.splitContainer2.Panel1.Controls.Add(this.rddping);
+            this.splitContainer2.Panel1.Controls.Add(this.rdpulse);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.splitContainer1);
+            this.splitContainer2.Size = new System.Drawing.Size(657, 340);
+            this.splitContainer2.SplitterDistance = 45;
+            this.splitContainer2.TabIndex = 1;
+            // 
+            // checkBoxDco
+            // 
+            this.checkBoxDco.AutoSize = true;
+            this.checkBoxDco.Location = new System.Drawing.Point(469, 13);
+            this.checkBoxDco.Name = "checkBoxDco";
+            this.checkBoxDco.Size = new System.Drawing.Size(48, 16);
+            this.checkBoxDco.TabIndex = 3;
+            this.checkBoxDco.Text = "双点";
+            this.checkBoxDco.UseVisualStyleBackColor = true;
+            this.checkBoxDco.CheckedChanged += new System.EventHandler(this.checkBoxDco_CheckedChanged);
+            // 
+            // checkBoxSco
+            // 
+            this.checkBoxSco.AutoSize = true;
+            this.checkBoxSco.Location = new System.Drawing.Point(356, 12);
+            this.checkBoxSco.Name = "checkBoxSco";
+            this.checkBoxSco.Size = new System.Drawing.Size(48, 16);
+            this.checkBoxSco.TabIndex = 2;
+            this.checkBoxSco.Text = "单点";
+            this.checkBoxSco.UseVisualStyleBackColor = true;
+            this.checkBoxSco.CheckedChanged += new System.EventHandler(this.checkBoxSco_CheckedChanged);
+            // 
+            // rddping
+            // 
+            this.rddping.AutoSize = true;
+            this.rddping.Location = new System.Drawing.Point(191, 12);
+            this.rddping.Name = "rddping";
+            this.rddping.Size = new System.Drawing.Size(59, 16);
+            this.rddping.TabIndex = 1;
+            this.rddping.TabStop = true;
+            this.rddping.Text = "电平式";
+            this.rddping.UseVisualStyleBackColor = true;
+            this.rddping.CheckedChanged += new System.EventHandler(this.rddping_CheckedChanged);
+            // 
+            // rdpulse
+            // 
+            this.rdpulse.AutoSize = true;
+            this.rdpulse.Location = new System.Drawing.Point(41, 12);
+            this.rdpulse.Name = "rdpulse";
+            this.rdpulse.Size = new System.Drawing.Size(59, 16);
+            this.rdpulse.TabIndex = 0;
+            this.rdpulse.TabStop = true;
+            this.rdpulse.Text = "脉冲式";
+            this.rdpulse.UseVisualStyleBackColor = true;
+            this.rdpulse.CheckedChanged += new System.EventHandler(this.rdpulse_CheckedChanged);
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.splitContainer1.IsSplitterFixed = true;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.listView1);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.BackColor = System.Drawing.Color.Lavender;
+            this.splitContainer1.Panel2.Controls.Add(this.buttoncancel);
+            this.splitContainer1.Panel2.Controls.Add(this.buttonselfen);
+            this.splitContainer1.Panel2.Controls.Add(this.buttonselhe);
+            this.splitContainer1.Panel2.Controls.Add(this.buttonexe);
+            this.splitContainer1.Size = new System.Drawing.Size(655, 289);
+            this.splitContainer1.SplitterDistance = 477;
+            this.splitContainer1.TabIndex = 1;
+            // 
+            // YkCmdViewForm
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(657, 340);
+            this.Controls.Add(this.splitContainer2);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Name = "YkCmdViewForm";
+            this.Text = "YkCmdViewForm";
+            this.Load += new System.EventHandler(this.YkCmdViewForm_Load);
+            this.Activated += new System.EventHandler(this.YkCmdViewForm_Activated);
+            this.VisibleChanged += new System.EventHandler(this.YkCmdViewForm_VisibleChanged);
+            this.contextMenuStrip1.ResumeLayout(false);
+            this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel1.PerformLayout();
+            this.splitContainer2.Panel2.ResumeLayout(false);
+            this.splitContainer2.ResumeLayout(false);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.ResumeLayout(false);
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.ListView listView1;
+
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.Button buttoncancel;
+        private System.Windows.Forms.Button buttonexe;
+        private System.Windows.Forms.Button buttonselhe;
+        private System.Windows.Forms.Button buttonselfen;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem AddMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem DeleteMenuItem;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.RadioButton rddping;
+        private System.Windows.Forms.RadioButton rdpulse;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.CheckBox checkBoxDco;
+        private System.Windows.Forms.CheckBox checkBoxSco;
+    }
+}

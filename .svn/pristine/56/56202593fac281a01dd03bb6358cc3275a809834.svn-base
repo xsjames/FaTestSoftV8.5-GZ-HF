@@ -1,0 +1,1823 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Runtime.InteropServices;
+using FaTestSoft.CommonData;              //使用新增加的类所在的命名空间
+
+namespace FaTestSoft
+{
+    class WriteReadAllFile
+    {
+        #region 本程序中用到的API函数声明
+
+        [DllImport("kernel32.DLL")]
+
+        private static extern int GetPrivateProfileString(string section, string key,
+                                                          string def, StringBuilder retVal,
+                                                          int size, string filePath);
+        /*参数说明：section：INI文件中的段落名称；key：INI文件中的关键字；
+          def：无法读取时候时候的缺省数值；retVal：读取数值；size：数值的大小；
+          filePath：INI文件的完整路径和名称。*/
+
+        [DllImport("kernel32.DLL")]
+        private static extern long WritePrivateProfileString(string section, string key,
+                                                             string val, string filePath);
+        /*参数说明：section：INI文件中的段落；key：INI文件中的关键字；
+          val：INI文件中关键字的数值；filePath：INI文件的完整的路径和名称。*/
+
+        #endregion
+
+        public static StringBuilder temp = new StringBuilder(255);       //初始化 一个StringBuilder的类型
+        public static string str;
+
+             /*************************************************************************
+             *  函数名：    WriteReadYxYkYmIniFile                                   *
+             *  功能  ：    3遥参数只可读ini文件                                     *
+             *  参数  ：    fname ：路径名                                           *
+             *              k     ：文件的类型                                       *
+             *  返回值：    无                                                       *
+             *  修改日期：  2010-11-09                                               *
+             *  作者    ：  cuibj                                                    *
+             * **********************************************************************/
+        public static void WriteReadYxYkYmIniFile(string fname, byte Type, byte k)
+        {
+            if (Type == 0)    //读
+            {
+
+                if (k == 0)              //读遥控ini
+                {
+                    GetPrivateProfileString("NUM", "YKNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass.YkIniInfo.num = int.Parse(temp.ToString());                    //转换为整型
+                    PublicDataClass.YkIniInfo.num = PublicDataClass.YkIniInfo.num / 2;
+                    PublicDataClass.YkIniInfo.NameTable = new string[PublicDataClass.YkIniInfo.num];
+                    PublicDataClass.YkIniInfo.StartPosTable = new string[PublicDataClass.YkIniInfo.num ];
+                    for (int j = 0; j < PublicDataClass.YkIniInfo.num; j++)
+                    {
+                        str = String.Format("ykindex_{0:d}", j);
+
+                        GetPrivateProfileString("YKTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.YkIniInfo.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass.YkIniInfo.num; j++)
+                    {
+                        str = String.Format("startpos_{0:d}", j);
+
+                        GetPrivateProfileString("STARTPOS", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass.YkIniInfo.StartPosTable[j] = temp.ToString();
+                    }
+
+
+                }
+                else if (k == 1)     //读遥测名称表
+                {
+                    GetPrivateProfileString("NUM", "YCNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.ThreeYNameTable.Ycnum = int.Parse(temp.ToString());            //转换为整型
+
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Ycnum; j++)
+                    {
+                        str = String.Format("ycname_{0:d}", j);
+
+                        GetPrivateProfileString("YCNAME", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.ThreeYNameTable.YcTable.Add(temp.ToString());
+                    }
+                }
+                else if (k == 2)     //读遥信名称表
+                {
+                    GetPrivateProfileString("NUM", "YXNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.ThreeYNameTable.Yxnum = int.Parse(temp.ToString());            //转换为整型
+
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Yxnum; j++)
+                    {
+                        str = String.Format("yxname_{0:d}", j);
+
+                        GetPrivateProfileString("YXNAME", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.ThreeYNameTable.YxTable.Add(temp.ToString());
+                    }
+                }
+                else if (k == 3)     //读遥脉名称表
+                {
+                    GetPrivateProfileString("NUM", "YMNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.ThreeYNameTable.Ymnum = int.Parse(temp.ToString());            //转换为整型
+
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Ymnum; j++)
+                    {
+                        str = String.Format("ymname_{0:d}", j);
+
+                        GetPrivateProfileString("YMNAME", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.ThreeYNameTable.YmTable.Add(temp.ToString());
+                    }
+                }
+                else if (k == 4)     //读遥测信息体地址表
+                {
+                
+                    GetPrivateProfileString("YCINFO", "INFONUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.InfoAddrTable.Ycnum = int.Parse(temp.ToString());            //转换为整型
+
+                    for (int j = 0; j < PublicDataClass.InfoAddrTable.Ycnum; j++)
+                    {
+                        str = String.Format("ycinfo_{0:d}", j);
+
+                        GetPrivateProfileString("YCINFOTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.InfoAddrTable.YcInfoATable.Add(temp.ToString());
+                    }
+                   /* for (int j = 0; j < PublicDataClass.InfoAddrTable.Ycnum; j++)
+                    {
+                        str = String.Format("ycShowIndex_{0:d}", j);
+
+                        GetPrivateProfileString("YCSHOWINDEXTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._ShowIndexTableParam.YcShowIndexTable.Add(temp.ToString());
+
+                    }*/
+                }
+                else if( k ==5)
+                {   //读遥信信息体地址
+                    GetPrivateProfileString("YXINFO", "INFONUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.InfoAddrTable.Yxnum = int.Parse(temp.ToString());            //转换为整型
+                    for (int j = 0; j < PublicDataClass.InfoAddrTable.Yxnum; j++)
+                    {
+                        str = String.Format("yxinfo_{0:d}", j);
+
+                        GetPrivateProfileString("YXINFOTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.InfoAddrTable.YxInfoATable.Add(temp.ToString());
+                    }
+                }
+                else if (k == 6)
+                {
+                    //读遥脉信息体地址
+                    GetPrivateProfileString("YMINFO", "INFONUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.InfoAddrTable.Ymnum = int.Parse(temp.ToString());            //转换为整型
+                    for (int j = 0; j < PublicDataClass.InfoAddrTable.Ymnum; j++)
+                    {
+                        str = String.Format("yminfo_{0:d}", j);
+
+                        GetPrivateProfileString("YMINFOTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.InfoAddrTable.YmInfoATable.Add(temp.ToString());
+                    }
+
+                }
+                else if (k == 7)              //读遥测参数
+                {
+                    GetPrivateProfileString("NUM", "YCPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._YcParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+                    PublicDataClass._YcParam.NameTable = new string[PublicDataClass._YcParam.num/ 3];
+                    PublicDataClass._YcParam.ValueTable = new string[PublicDataClass._YcParam.num/3];
+                    PublicDataClass._YcParam.ByteTable = new string[PublicDataClass._YcParam.num/3];
+
+                    for (int j = 0; j < PublicDataClass._YcParam.num/3; j++)
+                    {
+                        str = String.Format("ycpname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcParam.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcParam.ByteTable[j] = temp.ToString();
+                    }
+
+                }
+                else if (k == 8)              //读遥信参数
+                {
+                    GetPrivateProfileString("NUM", "YXPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._YxParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+                  
+                    PublicDataClass._YxParam.NameTable = new string[PublicDataClass._YxParam.num/3];
+                    PublicDataClass._YxParam.ValueTable = new string[PublicDataClass._YxParam.num / 3];
+                    PublicDataClass._YxParam.ByteTable = new string[PublicDataClass._YxParam.num / 3];
+
+                    for (int j = 0; j < PublicDataClass._YxParam.num / 3; j++)
+                    {
+                        str = String.Format("yxpname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YxParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YxParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YxParam.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YxParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YxParam.ByteTable[j] = temp.ToString();
+                    }
+
+                }
+                else if (k == 9)              //读遥控参数
+                {
+                    GetPrivateProfileString("NUM", "YKPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._YkParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+                    PublicDataClass._YkParam.NameTable = new string[PublicDataClass._YkParam.num /3];
+                    PublicDataClass._YkParam.ValueTable = new string[PublicDataClass._YkParam.num / 3];
+                    PublicDataClass._YkParam.ByteTable = new string[PublicDataClass._YkParam.num / 3];
+
+                    for (int j = 0; j < PublicDataClass._YkParam.num / 3; j++)
+                    {
+                        str = String.Format("ykpname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YkParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YkParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YkParam.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YkParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YkParam.ByteTable[j] = temp.ToString();
+                    }
+
+                }
+                else if (k == 10)              //读遥信线路配置参数
+                {
+                    GetPrivateProfileString("NUM", "YXLCFGPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._YxLineCfgParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+                 
+                    PublicDataClass._YxLineCfgParam.NameTable = new string[PublicDataClass._YxLineCfgParam.num / 3];
+                    PublicDataClass._YxLineCfgParam.ValueTable = new string[PublicDataClass._YxLineCfgParam.num / 3];
+                    PublicDataClass._YxLineCfgParam.ByteTable = new string[PublicDataClass._YxLineCfgParam.num / 3];
+
+                    for (int j = 0; j < PublicDataClass._YxLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("yxlcfgpname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YxLineCfgParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YxLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YxLineCfgParam.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YxLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YxLineCfgParam.ByteTable[j] = temp.ToString();
+                    }
+    
+
+                }
+                else if (k == 11)              //读遥测线路配置参数
+                {
+                    GetPrivateProfileString("NUM", "YCLCFGPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._YcLineCfgParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+
+                    PublicDataClass._YcLineCfgParam.NameTable = new string[PublicDataClass._YcLineCfgParam.num / 3];
+                    PublicDataClass._YcLineCfgParam.ValueTable = new string[PublicDataClass._YcLineCfgParam.num / 3];
+                    PublicDataClass._YcLineCfgParam.ByteTable = new string[PublicDataClass._YcLineCfgParam.num / 3];
+
+                    for (int j = 0; j < PublicDataClass._YcLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("yclcfgpname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcLineCfgParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcLineCfgParam.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcLineCfgParam.ByteTable[j] = temp.ToString();
+                    }
+                  
+                }
+                else if (k == 12)   //扰动参数
+                {
+                    GetPrivateProfileString("NUM", "PARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._RaoDong.num = int.Parse(temp.ToString());                    //转换为整型
+
+
+                    PublicDataClass._RaoDong.NameTable = new string[PublicDataClass._RaoDong.num / 3];
+                    PublicDataClass._RaoDong.ValueTable = new string[PublicDataClass._RaoDong.num / 3];
+                    PublicDataClass._RaoDong.ByteTable = new string[PublicDataClass._RaoDong.num / 3];
+
+                    for (int j = 0; j < PublicDataClass._RaoDong.num / 3; j++)
+                    {
+                        str = String.Format("pname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._RaoDong.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._RaoDong.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._RaoDong.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._RaoDong.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._RaoDong.ByteTable[j] = temp.ToString();
+                    }
+                }
+                else if (k == 13)     //读内遥信名称表
+                {
+                    GetPrivateProfileString("NUM", "YXNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.ThreeYNameTable.YxOfinnum = int.Parse(temp.ToString());            //转换为整型
+
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.YxOfinnum; j++)
+                    {
+                        str = String.Format("yxname_{0:d}", j);
+
+                        GetPrivateProfileString("YXNAME", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.ThreeYNameTable.YxOfinTable.Add(temp.ToString());
+                    }
+                }
+                else if (k == 14)     //读历史数据名称表
+                {
+                    GetPrivateProfileString("NUM", "YCHISNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass._HisData.ycnum = int.Parse(temp.ToString());            //转换为整型
+                    PublicDataClass._HisData.YcNameTable = new string[PublicDataClass._HisData.ycnum];
+                    for (int j = 0; j < PublicDataClass._HisData.ycnum; j++)
+                    {
+                        str = String.Format("ychisname_{0:d}", j);
+
+                        GetPrivateProfileString("YCHISNAME", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass._HisData.YcNameTable[j] = temp.ToString();
+                    }
+                }
+                else if (k == 15)     //读统计数据名称表
+                {
+                    GetPrivateProfileString("NUM", "TJHISNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass._HisData.tjnum = int.Parse(temp.ToString());            //转换为整型
+                    PublicDataClass._HisData.TjNameTable = new string[PublicDataClass._HisData.tjnum];
+                    for (int j = 0; j < PublicDataClass._HisData.tjnum; j++)
+                    {
+                        str = String.Format("tjhisname_{0:d}", j);
+
+                        GetPrivateProfileString("TJHISNAME", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass._HisData.TjNameTable[j] = temp.ToString();
+                    }
+                }
+                else if (k == 16)     //读遥控逻辑名称表
+                {
+                    GetPrivateProfileString("NUM", "PARAMNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass._YkLogicInfo.num = int.Parse(temp.ToString());            //转换为整型
+                    PublicDataClass._YkLogicInfo.NameTable = new string[PublicDataClass._YkLogicInfo.num / 3];
+                    PublicDataClass._YkLogicInfo.ValueTable = new string[PublicDataClass._YkLogicInfo.num / 3];
+                    PublicDataClass._YkLogicInfo.ByteTable = new string[PublicDataClass._YkLogicInfo.num / 3];
+
+                    for (int j = 0; j < PublicDataClass._YkLogicInfo.num / 3; j++)
+                    {
+                        str = String.Format("name_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YkLogicInfo.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YkLogicInfo.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YkLogicInfo.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YkLogicInfo.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YkLogicInfo.ByteTable[j] = temp.ToString();
+                    }
+                }
+                else if (k == 17) //采集器
+                {
+                    
+                    GetPrivateProfileString("NUM", "PARAMNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass._Collector.num = int.Parse(temp.ToString());
+
+                    PublicDataClass._Collector.NameTable = new string[PublicDataClass._Collector.num / 3];
+                    PublicDataClass._Collector.ValueTable = new string[PublicDataClass._Collector.num / 3];
+                    PublicDataClass._Collector.ByteTable = new string[PublicDataClass._Collector.num / 3];
+
+                    for (int j = 0; j < PublicDataClass._Collector.num/3; j++)
+                    {
+                        str = String.Format("pname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._Collector.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._Collector.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._Collector.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._Collector.num / 3; j++)
+                    {
+                        str = String.Format("byte_{0:d}", j);
+
+                        GetPrivateProfileString("BYTETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._Collector.ByteTable[j] = temp.ToString();
+                    }
+                    //故障指示器
+                    PublicDataClass._Indicatorstruct.INDICATOR_Num = Convert.ToByte(PublicDataClass._Collector.ValueTable[0]);
+                    if (PublicDataClass._Indicatorstruct.INDICATOR_Num != 0)
+                    {
+                        PublicDataClass._Indicatorstruct.protocoltypeInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+                        PublicDataClass._Indicatorstruct.baudInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+                        PublicDataClass._Indicatorstruct.AddrInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+
+                        int pos = 0;
+                        for (int j = 0; j < PublicDataClass._Indicatorstruct.INDICATOR_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("INDICATORNAMETABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Indicatorstruct.protocoltypeInfo[pos - 1].NameTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Indicatorstruct.baudInfo[pos - 1].NameTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Indicatorstruct.AddrInfo[pos - 1].NameTable = temp.ToString();
+
+                        }
+                        pos = 0;
+                        for (int j = 0; j < PublicDataClass._Indicatorstruct.INDICATOR_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("INDICATORDATATABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Indicatorstruct.protocoltypeInfo[pos - 1].ValueTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Indicatorstruct.baudInfo[pos - 1].ValueTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Indicatorstruct.AddrInfo[pos - 1].ValueTable = temp.ToString();
+
+                        }
+                        pos = 0;
+                        for (int j = 0; j < PublicDataClass._Indicatorstruct.INDICATOR_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("INDICATORBYTETABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Indicatorstruct.protocoltypeInfo[pos - 1].ByteTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Indicatorstruct.baudInfo[pos - 1].ByteTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Indicatorstruct.AddrInfo[pos - 1].ByteTable = temp.ToString();
+
+                        }
+                    }
+                    //汇集器
+                    PublicDataClass._Huijiqistruct.Huijiqi_Num = Convert.ToByte(PublicDataClass._Collector.ValueTable[1]);
+                    if (PublicDataClass._Huijiqistruct.Huijiqi_Num != 0)
+                    {
+                        PublicDataClass._Huijiqistruct.protocoltypeInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+                        PublicDataClass._Huijiqistruct.baudInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+                        PublicDataClass._Huijiqistruct.AddrInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+
+                        int pos = 0;
+                        for (int j = 0; j < PublicDataClass._Huijiqistruct.Huijiqi_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("HUIJIQINAMETABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Huijiqistruct.protocoltypeInfo[pos - 1].NameTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Huijiqistruct.baudInfo[pos - 1].NameTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Huijiqistruct.AddrInfo[pos - 1].NameTable = temp.ToString();
+
+                        }
+                        pos = 0;
+                        for (int j = 0; j < PublicDataClass._Huijiqistruct.Huijiqi_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("HUIJIQIDATATABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Huijiqistruct.protocoltypeInfo[pos - 1].ValueTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Huijiqistruct.baudInfo[pos - 1].ValueTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Huijiqistruct.AddrInfo[pos - 1].ValueTable = temp.ToString();
+
+                        }
+                        pos = 0;
+                        for (int j = 0; j < PublicDataClass._Huijiqistruct.Huijiqi_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("HUIJIQIBYTETABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Huijiqistruct.protocoltypeInfo[pos - 1].ByteTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Huijiqistruct.baudInfo[pos - 1].ByteTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Huijiqistruct.AddrInfo[pos - 1].ByteTable = temp.ToString();
+
+                        }
+                    }
+
+                    //温湿度传感器
+                    PublicDataClass._Sensorstruct.Sensor_Num = Convert.ToByte(PublicDataClass._Collector.ValueTable[2]);
+                    if (PublicDataClass._Sensorstruct.Sensor_Num != 0)
+                    {
+                        PublicDataClass._Sensorstruct.protocoltypeInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+                        PublicDataClass._Sensorstruct.baudInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+                        PublicDataClass._Sensorstruct.AddrInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+
+                        int pos = 0;
+                        for (int j = 0; j < PublicDataClass._Sensorstruct.Sensor_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("SENSORNAMETABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Sensorstruct.protocoltypeInfo[pos - 1].NameTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Sensorstruct.baudInfo[pos - 1].NameTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Sensorstruct.AddrInfo[pos - 1].NameTable = temp.ToString();
+
+                        }
+                        pos = 0;
+                        for (int j = 0; j < PublicDataClass._Sensorstruct.Sensor_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("SENSORDATATABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Sensorstruct.protocoltypeInfo[pos - 1].ValueTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Sensorstruct.baudInfo[pos - 1].ValueTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Sensorstruct.AddrInfo[pos - 1].ValueTable = temp.ToString();
+
+                        }
+                        pos = 0;
+                        for (int j = 0; j < PublicDataClass._Sensorstruct.Sensor_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("SENSORBYTETABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Sensorstruct.protocoltypeInfo[pos - 1].ByteTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Sensorstruct.baudInfo[pos - 1].ByteTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Sensorstruct.AddrInfo[pos - 1].ByteTable = temp.ToString();
+
+                        }
+                    }
+                    //臭氧设备
+                    PublicDataClass._Q2struct.Q2_Num = Convert.ToByte(PublicDataClass._Collector.ValueTable[3]);
+                    if (PublicDataClass._Q2struct.Q2_Num != 0)
+                    {
+                        PublicDataClass._Q2struct.protocoltypeInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+                        PublicDataClass._Q2struct.baudInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+                        PublicDataClass._Q2struct.AddrInfo = new PublicDataClass._DeviceInfo[PublicDataClass._Indicatorstruct.INDICATOR_Num];
+
+                        int pos = 0;
+                        for (int j = 0; j < PublicDataClass._Q2struct.Q2_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("Q2NAMETABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Q2struct.protocoltypeInfo[pos - 1].NameTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Q2struct.baudInfo[pos - 1].NameTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Q2struct.AddrInfo[pos - 1].NameTable = temp.ToString();
+
+                        }
+                        pos = 0;
+                        for (int j = 0; j < PublicDataClass._Q2struct.Q2_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("Q2DATATABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Q2struct.protocoltypeInfo[pos - 1].ValueTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Q2struct.baudInfo[pos - 1].ValueTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Q2struct.AddrInfo[pos - 1].ValueTable = temp.ToString();
+
+                        }
+                        pos = 0;
+                        for (int j = 0; j < PublicDataClass._Q2struct.Q2_Num * 3; j++)
+                        {
+                            str = String.Format("index_{0:d}", j);
+
+                            GetPrivateProfileString("Q2BYTETABLE", str, "无法读取对应数值！",
+                                                         temp, 255, fname);
+                            if (j == pos * 3)
+                                pos++;
+                            if (j == (pos * 3 - 3))
+                                PublicDataClass._Q2struct.protocoltypeInfo[pos - 1].ByteTable = temp.ToString();
+                            else if (j == (pos * 3 - 2))
+                                PublicDataClass._Q2struct.baudInfo[pos - 1].ByteTable = temp.ToString();
+                            else if (j == (pos * 3 - 1))
+                                PublicDataClass._Q2struct.AddrInfo[pos - 1].ByteTable = temp.ToString();
+
+                        }
+                    }
+                }
+
+                else if (k == 18)              //遥测点号表配置参数
+                {
+                    GetPrivateProfileString("NUM", "YCDOTCFGPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._YcDotParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+
+                    PublicDataClass._YcDotParam.NameTable = new string[PublicDataClass._YcDotParam.num / 5];
+                    PublicDataClass._YcDotParam.BusNumTable = new string[PublicDataClass._YcDotParam.num / 5];
+                    PublicDataClass._YcDotParam.CardNumTable = new string[PublicDataClass._YcDotParam.num / 5];
+                    PublicDataClass._YcDotParam.UBusConnectionmodeTable = new string[PublicDataClass._YcDotParam.num / 5];
+                    PublicDataClass._YcDotParam.IBusConnectionmodeTable = new string[PublicDataClass._YcDotParam.num / 5];
+
+
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5 ; j++)
+                    {
+                        str = String.Format("ycdotcfgpname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcDotParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        str = String.Format("ibusnum_{0:d}", j);
+
+                        GetPrivateProfileString("IBUSNUMTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcDotParam.BusNumTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        str = String.Format("cardnum_{0:d}", j);
+
+                        GetPrivateProfileString("CARDNUMTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcDotParam.CardNumTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        str = String.Format("ubusconnectionmode_{0:d}", j);
+
+                        GetPrivateProfileString("UBUSCONNECTIONMODETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcDotParam.UBusConnectionmodeTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        str = String.Format("ibusconnectionmode_{0:d}", j);
+
+                        GetPrivateProfileString("IBUSCONNECTIONMODETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcDotParam.IBusConnectionmodeTable[j] = temp.ToString();
+                    }
+
+                }
+
+                else if (k == 19)              //读遥测信息表配置参数信息
+                {
+                    GetPrivateProfileString("NUM", "XINXICFGPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._YcInformationParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+
+                    PublicDataClass._YcInformationParam.NameTable = new string[PublicDataClass._YcInformationParam.num / 4];
+                    PublicDataClass._YcInformationParam.IndexTable = new string[PublicDataClass._YcInformationParam.num / 4];
+                    PublicDataClass._YcInformationParam.DatatypeTable = new string[PublicDataClass._YcInformationParam.num / 4];
+                    PublicDataClass._YcInformationParam.MagnificationTable = new string[PublicDataClass._YcInformationParam.num / 4];
+
+                    for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        str = String.Format("xinxicfgpname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcInformationParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        str = String.Format("index_{0:d}", j);
+
+                        GetPrivateProfileString("INDEXTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcInformationParam.IndexTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        str = String.Format("datatyple_{0:d}", j);
+
+                        GetPrivateProfileString("DATATYPLETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcInformationParam.DatatypeTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        str = String.Format("beishu_{0:d}", j);
+
+                        GetPrivateProfileString("BEISHUTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YcInformationParam.MagnificationTable[j] = temp.ToString();
+                    }
+                }
+                else if (k == 20)//遥信取反
+                {
+                    GetPrivateProfileString("NUM", "YXNUM", "无法读取对应数值！",
+                                                      temp, 255, fname);
+                    PublicDataClass._YxDataQFParam.num = int.Parse(temp.ToString());                    //转换为整型
+                    PublicDataClass._YxDataQFParam.DataQFTable = new string[PublicDataClass.ThreeYNameTable.Yxnum];
+
+                    PublicDataClass._YxDataQFParam.ByteTable = new string[PublicDataClass.ThreeYNameTable.Yxnum];
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Yxnum; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                             PublicDataClass._YxDataQFParam.DataQFTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Yxnum; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._YxDataQFParam.ByteTable[j] = temp.ToString();
+                    }
+                
+                }
+            }
+            /*str = Convert.ToString(CommonDatainterFace.YkIniInfo.num);
+                    WritePrivateProfileString("NUM", "YKNUM", str, fname);
+                    for (int j = 0; j < CommonDatainterFace.YkIniInfo.num; j++)
+                    {
+                        str = String.Format("ykindex_{0:d}", j);
+                        WritePrivateProfileString("YKTABLE", str, CommonDatainterFace.YkIniInfo.IniTable[j], fname);
+                    }*/
+            else           //写参数
+            {
+                if (k == 0)
+                { }
+                else if (k == 1)   //遥测名称表
+                {
+                    str = Convert.ToString(PublicDataClass.ThreeYNameTable.Ycnum);
+                    WritePrivateProfileString("NUM", "YCNUM", str, fname);
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Ycnum; j++)
+                    {
+                        str = String.Format("ycname_{0:d}", j);
+                        WritePrivateProfileString("YCNAME", str, Convert.ToString(PublicDataClass.ThreeYNameTable.YcTable[j]),fname);
+                    }
+
+
+                }
+                else if (k == 2)   //遥信名称表
+                {
+                    str = Convert.ToString(PublicDataClass.ThreeYNameTable.Yxnum);
+                    WritePrivateProfileString("NUM", "YXNUM", str, fname);
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Yxnum; j++)
+                    {
+                        str = String.Format("yxname_{0:d}", j);
+                        WritePrivateProfileString("YXNAME", str, Convert.ToString(PublicDataClass.ThreeYNameTable.YxTable[j]), fname);
+                    }
+
+                }
+                else if (k == 3) //遥脉名称表
+                {
+                    str = Convert.ToString(PublicDataClass.ThreeYNameTable.Ymnum);
+                    WritePrivateProfileString("NUM", "YMNUM", str, fname);
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Ymnum; j++)
+                    {
+                        str = String.Format("ymname_{0:d}", j);
+                        WritePrivateProfileString("YMNAME", str, Convert.ToString(PublicDataClass.ThreeYNameTable.YmTable[j]), fname);
+                    }
+                }
+                else if (k == 4) //遥测信息体表
+                {
+                    str = Convert.ToString(PublicDataClass.ThreeYNameTable.Ycnum);
+                    WritePrivateProfileString("YCINFO", "INFONUM", str, fname);
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Ycnum; j++)
+                    {
+                        str = String.Format("ycinfo_{0:d}", j);
+                        WritePrivateProfileString("YCINFOTABLE", str, Convert.ToString(PublicDataClass.ThreeYNameTable.YcTable[j]), fname);
+                    }
+                   /*   for (int j = 0; j < PublicDataClass.ThreeYNameTable.Ycnum; j++)
+                    {
+                        str = String.Format("ycShowIndex_{0:d}", j);
+                        WritePrivateProfileString("YCSHOWINDEXTABLE", str, Convert.ToString(PublicDataClass._ShowIndexTableParam .YcShowIndexTable [j]), fname);
+                    }*/
+      
+                }
+                else if (k == 5) //遥信信息体表
+                {
+                    str = Convert.ToString(PublicDataClass.ThreeYNameTable.Yxnum);
+                    WritePrivateProfileString("YXINFO", "INFONUM", str, fname);
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Ymnum; j++)
+                    {
+                        str = String.Format("yxinfo_{0:d}", j);
+                        WritePrivateProfileString("YXINFOTABLE", str, Convert.ToString(PublicDataClass.ThreeYNameTable.YxTable[j]), fname);
+                    }
+                }
+                else if (k == 6) //遥脉信息体表
+                {
+                    str = Convert.ToString(PublicDataClass.ThreeYNameTable.Ymnum);
+                    WritePrivateProfileString("YMINFO", "INFONUM", str, fname);
+                    for (int j = 0; j < PublicDataClass.ThreeYNameTable.Ymnum; j++)
+                    {
+                        str = String.Format("yminfo_{0:d}", j);
+                        WritePrivateProfileString("YMINFOTABLE", str, Convert.ToString(PublicDataClass.ThreeYNameTable.YmTable[j]), fname);
+                    }
+                }
+                else if (k == 7) //遥测参数
+                {
+                    str = Convert.ToString(PublicDataClass._YcParam.num);
+                    WritePrivateProfileString("NUM", "YCPARAMNUM", str, fname);
+
+                    for (int j = 0; j < PublicDataClass._YcParam.num / 3; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("VALUETABLE", null, null, fname);
+                        WritePrivateProfileString("BEILVTABLE", null, null, fname);
+                    }
+
+
+
+                    for (int j = 0; j < PublicDataClass._YcParam.num/3; j++)
+                    {
+                        str = String.Format("ycpname_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._YcParam.NameTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YcParam.num/3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        WritePrivateProfileString("VALUETABLE", str, Convert.ToString(PublicDataClass._YcParam.ValueTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._YcParam.num/3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+                        WritePrivateProfileString("BEILVTABLE", str, Convert.ToString(PublicDataClass._YcParam.ByteTable[j]), fname);
+                    }
+                }
+                else if (k == 8) //遥信参数
+                {
+                    
+                    str = Convert.ToString(PublicDataClass._YxParam.num);
+                    WritePrivateProfileString("NUM", "YXPARAMNUM", str, fname);
+
+                    for (int j = 0; j < PublicDataClass._YxParam.num / 3; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("VALUETABLE", null, null, fname);
+                        WritePrivateProfileString("BEILVTABLE", null, null, fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YxParam.num / 3; j++)
+                    {
+                        str = String.Format("yxpname_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._YxParam.NameTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YxParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        WritePrivateProfileString("VALUETABLE", str, Convert.ToString(PublicDataClass._YxParam.ValueTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._YxParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+                        WritePrivateProfileString("BEILVTABLE", str, Convert.ToString(PublicDataClass._YxParam.ByteTable[j]), fname);
+                    }
+                }
+                else if (k == 9) //遥控参数
+                {
+
+                    str = Convert.ToString(PublicDataClass._YkParam.num);
+                    WritePrivateProfileString("NUM", "YKPARAMNUM", str, fname);
+                    for (int j = 0; j < PublicDataClass._YkParam.num / 3; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("VALUETABLE", null, null, fname);
+                        WritePrivateProfileString("BEILVTABLE", null, null, fname);
+                    }
+
+                    for (int j = 0; j < PublicDataClass._YkParam.num / 3; j++)
+                    {
+                        str = String.Format("ykpname_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._YkParam.NameTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YkParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        WritePrivateProfileString("VALUETABLE", str, Convert.ToString(PublicDataClass._YkParam.ValueTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._YkParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+                        WritePrivateProfileString("BEILVTABLE", str, Convert.ToString(PublicDataClass._YkParam.ByteTable[j]), fname);
+                    }
+                }
+                else if (k == 10) //遥信配置参数
+                {
+
+                    str = Convert.ToString(PublicDataClass._YxLineCfgParam.num);
+                    WritePrivateProfileString("NUM", "YXLCFGPARAMNUM", str, fname);
+
+                    for (int j = 0; j < PublicDataClass._YxLineCfgParam.num / 3; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("VALUETABLE", null, null, fname);
+                        WritePrivateProfileString("BEILVTABLE", null, null, fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YxLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("yxlcfgpname_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._YxLineCfgParam.NameTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YxLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        WritePrivateProfileString("VALUETABLE", str, Convert.ToString(PublicDataClass._YxLineCfgParam.ValueTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._YxLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+                        WritePrivateProfileString("BEILVTABLE", str, Convert.ToString(PublicDataClass._YxLineCfgParam.ByteTable[j]), fname);
+                    }
+                }
+                else if (k == 11) //遥测配置参数
+                {
+
+                    str = Convert.ToString(PublicDataClass._YcLineCfgParam.num);
+                    WritePrivateProfileString("NUM", "YCLCFGPARAMNUM", str, fname);
+
+                    for (int j = 0; j < PublicDataClass._YcLineCfgParam.num / 3; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("VALUETABLE", null, null, fname);
+                        WritePrivateProfileString("BEILVTABLE", null, null, fname);
+                    }
+
+                    for (int j = 0; j < PublicDataClass._YcLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("yclcfgpname_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._YcLineCfgParam.NameTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YcLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        WritePrivateProfileString("VALUETABLE", str, Convert.ToString(PublicDataClass._YcLineCfgParam.ValueTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._YcLineCfgParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+                        WritePrivateProfileString("BEILVTABLE", str, Convert.ToString(PublicDataClass._YcLineCfgParam.ByteTable[j]), fname);
+                    }
+                }
+
+                else if (k == 18) //遥测点号表配置参数
+                {
+
+                    str = Convert.ToString(PublicDataClass._YcDotParam.num);
+                    WritePrivateProfileString("NUM", "YCDOTCFGPARAMNUM", str, fname);
+
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("IBUSNUMTABLE", null, null, fname);
+                        WritePrivateProfileString("CARDNUMTABLE", null, null, fname);
+                        WritePrivateProfileString("UBUSCONNECTIONMODETABLE", null, null, fname);
+                        WritePrivateProfileString("IBUSCONNECTIONMODETABLE", null, null, fname);
+                    }
+
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        str = String.Format("ycdotcfgpname_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._YcDotParam.NameTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        str = String.Format("ibusnum_{0:d}", j);
+
+                        WritePrivateProfileString("IBUSNUMTABLE", str, Convert.ToString(PublicDataClass._YcDotParam.BusNumTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        str = String.Format("cardnum_{0:d}", j);
+                        WritePrivateProfileString("CARDNUMTABLE", str, Convert.ToString(PublicDataClass._YcDotParam.CardNumTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        str = String.Format("ubusconnectionmode_{0:d}", j);
+                        WritePrivateProfileString("UBUSCONNECTIONMODETABLE", str, Convert.ToString(PublicDataClass._YcDotParam.UBusConnectionmodeTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                    {
+                        str = String.Format("ibusconnectionmode_{0:d}", j);
+                        WritePrivateProfileString("IBUSCONNECTIONMODETABLE", str, Convert.ToString(PublicDataClass._YcDotParam.IBusConnectionmodeTable[j]), fname);
+                    }
+                }
+
+                else if (k == 19) //遥测信息表配置参数
+                {
+
+                    str = Convert.ToString(PublicDataClass._YcInformationParam.num);
+                    WritePrivateProfileString("NUM", "XINXICFGPARAMNUM", str, fname);
+
+                    for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("INDEXTABLE", null, null, fname);
+                        WritePrivateProfileString("DATATYPLETABLE", null, null, fname);
+                        WritePrivateProfileString("BEISHUTABLE", null, null, fname);
+                    }
+
+                    for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        str = String.Format("xinxicfgpname_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._YcInformationParam.NameTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        str = String.Format("index_{0:d}", j);
+
+                        WritePrivateProfileString("INDEXTABLE", str, Convert.ToString(PublicDataClass._YcInformationParam.IndexTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        str = String.Format("datatyple_{0:d}", j);
+                        WritePrivateProfileString("DATATYPLETABLE", str, Convert.ToString(PublicDataClass._YcInformationParam.DatatypeTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        str = String.Format("beishu_{0:d}", j);
+                        WritePrivateProfileString("BEISHUTABLE", str, Convert.ToString(PublicDataClass._YcInformationParam.MagnificationTable[j]), fname);
+                    }
+                }
+                else if (k == 20)//遥信取反
+                {
+
+                    str = Convert.ToString(PublicDataClass._YxDataQFParam.num);
+                    WritePrivateProfileString("NUM", "YXNUM", str, fname);
+
+                    for (int j = 0; j < PublicDataClass._YxDataQFParam.num/2; j++)
+                    {
+                        WritePrivateProfileString("VALUETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("BEILVTABLE", null, null, fname);     //先清除掉
+                      
+                    }
+
+                    for (int j = 0; j < PublicDataClass._YxDataQFParam.num/2; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        WritePrivateProfileString("VALUETABLE", str, Convert.ToString(PublicDataClass._YxDataQFParam.DataQFTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._YxDataQFParam.num / 2; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        WritePrivateProfileString("BEILVTABLE", str, Convert.ToString(PublicDataClass._YxDataQFParam.ByteTable[j]), fname);
+                    }
+                    
+
+                   
+
+                }
+            }
+
+        }
+        /*************************************************************************
+         *  函数名：    WriteReadSysIniFile                                      *
+         *  功能  ：    系统可写可读ini文件                                      *
+         *  参数  ：    fname ：路径名                                           *
+         *              Type  ：0--读,1--写                                      *
+         *              k     ：那一种文件                                       *
+         *  返回值：    无                                                       *
+         *  修改日期：  2010-11-09                                               *
+         *  作者    ：  cuibj                                                    *
+         * **********************************************************************/
+        public static void WriteReadSysIniFile(string fname, byte Type, byte k)
+        {
+            if (Type == 0)          //读
+            {
+                if (k == 0)              //读网络参数
+                {
+                    GetPrivateProfileString("NUM", "NETPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._NetParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+                    for (int j = 0; j < PublicDataClass._NetParam.num; j++)
+                    {
+                        str = String.Format("netparam_{0:d}", j);
+
+                        GetPrivateProfileString("TABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        if (j == 0)
+                            PublicDataClass._NetParam.IP = temp.ToString();             //IP
+                        else if (j == 1)
+                            PublicDataClass._NetParam.GwIP = temp.ToString();          //网关
+                        else if (j == 2)
+                            PublicDataClass._NetParam.SubMask = temp.ToString();       //子网掩码
+                        else if (j == 3)
+                            PublicDataClass._NetParam.Port = temp.ToString();          //端口号
+                        else if (j == 4)
+                            PublicDataClass._NetParam.SrcHA = temp.ToString();          //Mac地址
+                    }
+
+                }
+                else if (k == 1)              //读串口参数
+                {
+                    GetPrivateProfileString("NUM", "COMPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._ComParam.num = int.Parse(temp.ToString());                    //转换为整型
+                    PublicDataClass._ComParam.BaudRateTable = new string[PublicDataClass._ComParam.num / 3];
+                    PublicDataClass._ComParam.JyTable       = new string[PublicDataClass._ComParam.num / 3];
+                    PublicDataClass._ComParam.DataBitTable  = new string[PublicDataClass._ComParam.num / 3];
+                    for (int j = 0; j < PublicDataClass._ComParam.num/3; j++)
+                    {
+                        str = String.Format("baudrate_{0:d}", j);
+
+                        GetPrivateProfileString("BAUDRATE", str, "无法读取对应数值！",temp, 255, fname);
+                                                     
+                        PublicDataClass._ComParam.BaudRateTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._ComParam.num / 3; j++)
+                    {
+                        str = String.Format("jy_{0:d}", j);
+
+                        GetPrivateProfileString("JY", str, "无法读取对应数值！",temp, 255, fname);
+                                                     
+                        PublicDataClass._ComParam.JyTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._ComParam.num / 3; j++)
+                    {
+                        str = String.Format("databit_{0:d}", j);
+
+                        GetPrivateProfileString("DATABIT", str, "无法读取对应数值！",temp, 255, fname);
+                                                     
+                        PublicDataClass._ComParam.DataBitTable[j] = temp.ToString();
+                    }
+
+                }
+                else if (k == 2)              //读系统参数
+                {
+                    GetPrivateProfileString("NUM", "SYSPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._SysParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+                    PublicDataClass._SysParam.num = PublicDataClass._SysParam.num / 3;
+                    PublicDataClass._SysParam.NameTable  = new string[PublicDataClass._SysParam.num];
+                    PublicDataClass._SysParam.ValueTable = new string[PublicDataClass._SysParam.num];
+                    PublicDataClass._SysParam.ByteTable = new string[PublicDataClass._SysParam.num];
+
+                    for (int j = 0; j < PublicDataClass._SysParam.num; j++)
+                    {
+                        str = String.Format("syename_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._SysParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._SysParam.num; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._SysParam.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._SysParam.num; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._SysParam.ByteTable[j] = temp.ToString();
+                    }
+
+                }
+                
+                
+               
+                else if (k == 4)              //读gprs参数
+                {
+                    GetPrivateProfileString("NUM", "GPRSPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._GprsParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+                    for (int j = 0; j < PublicDataClass._GprsParam.num; j++)
+                    {
+                        str = String.Format("gprsparam_{0:d}", j);
+
+                        GetPrivateProfileString("TABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        if (j == 0)
+                            PublicDataClass._GprsParam.IP = temp.ToString();             //IP
+                        else if (j == 1)
+                            PublicDataClass._GprsParam.BIP = temp.ToString();          //网关
+                        else if (j == 2)
+                            PublicDataClass._GprsParam.Port = temp.ToString();       //子网掩码
+                        else if (j == 3)
+                            PublicDataClass._GprsParam.BPort = temp.ToString();          //端口号
+                        else if (j == 4)
+                            PublicDataClass._GprsParam.Heart = temp.ToString();          //Mac地址
+                        else
+                            PublicDataClass._GprsParam.APN = temp.ToString();          //Mac地址
+                    }
+
+                }
+                else if (k == 5)          //读协议ini
+                {
+                    
+                    GetPrivateProfileString("NUM", "PROTOCOLNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.ProtocolIniInfo.num = int.Parse(temp.ToString());             //转换为整型
+                    PublicDataClass.ProtocolIniInfo.IniTable = new string[PublicDataClass.ProtocolIniInfo.num];
+                    for (int j = 0; j < PublicDataClass.ProtocolIniInfo.num; j++)
+                    {
+                        str = String.Format("protocol_{0:d}", j);
+
+                        GetPrivateProfileString("TABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.ProtocolIniInfo.IniTable[j] = temp.ToString();
+                    }
+
+                }
+                else if (k == 6)      //读波特率ini表
+                {
+                    GetPrivateProfileString("BNUM", "num_baudrate", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.BaudRateAJyIniInfo.Bnum = int.Parse(temp.ToString());            //转换为整型
+                    PublicDataClass.BaudRateAJyIniInfo.BIniTable = new string[PublicDataClass.BaudRateAJyIniInfo.Bnum];
+                    for (int j = 0; j < PublicDataClass.BaudRateAJyIniInfo.Bnum; j++)
+                    {
+                        str = String.Format("baudrate_{0:d}", j);
+
+                        GetPrivateProfileString("BAUDRATE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.BaudRateAJyIniInfo.BIniTable[j] = temp.ToString();
+                    }
+                    GetPrivateProfileString("JYNUM", "num_jy", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.BaudRateAJyIniInfo.JYnum = int.Parse(temp.ToString());            //转换为整型
+                    PublicDataClass.BaudRateAJyIniInfo.JIniTable = new string[PublicDataClass.BaudRateAJyIniInfo.JYnum];
+                    for (int j = 0; j < PublicDataClass.BaudRateAJyIniInfo.JYnum; j++)
+                    {
+                        str = String.Format("jy_{0:d}", j);
+
+                        GetPrivateProfileString("JY", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.BaudRateAJyIniInfo.JIniTable[j] = temp.ToString();
+                    }
+
+                }
+                else if (k == 7)      //读port ini表
+                {
+                    GetPrivateProfileString("NUM", "PORTNUM", "无法读取对应数值！",
+                                                        temp, 255, fname);
+                    PublicDataClass.PortIniInfo.num = int.Parse(temp.ToString());            //转换为整型
+                    PublicDataClass.PortIniInfo.IniTable = new string[PublicDataClass.PortIniInfo.num];
+                    for (int j = 0; j < PublicDataClass.PortIniInfo.num; j++)
+                    {
+                        str = String.Format("port_{0:d}", j);
+
+                        GetPrivateProfileString("TABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                        PublicDataClass.PortIniInfo.IniTable[j] = temp.ToString();
+                    }
+
+                }
+                else if (k == 8)      //读运行参数表
+                {
+                    GetPrivateProfileString("NUM", "RUNPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._RunParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+                    //PublicDataClass._RunParam.num = PublicDataClass._RunParam.num / 3;
+                    PublicDataClass._RunParam.NameTable = new string[PublicDataClass._RunParam.num /3];
+                    PublicDataClass._RunParam.ValueTable = new string[PublicDataClass._RunParam.num / 3];
+                    PublicDataClass._RunParam.ByteTable = new string[PublicDataClass._RunParam.num / 3];
+
+                    for (int j = 0; j < PublicDataClass._RunParam.num/3; j++)
+                    {
+                        str = String.Format("runname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._RunParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._RunParam.num/3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._RunParam.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._RunParam.num/3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._RunParam.ByteTable[j] = temp.ToString();
+                    }
+
+                }
+                else if (k == 9)      //读系统保护参数表
+                {
+                    GetPrivateProfileString("NUM", "FUNCPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._FuncParam.num = int.Parse(temp.ToString());                    //转换为整型
+
+                    PublicDataClass._FuncParam.NameTable = new string[PublicDataClass._FuncParam.num];
+                    PublicDataClass._FuncParam.ValueTable = new string[PublicDataClass._FuncParam.num];
+                    PublicDataClass._FuncParam.ByteTable = new string[PublicDataClass._FuncParam.num];
+
+                    for (int j = 0; j < PublicDataClass._FuncParam.num/3; j++)
+                    {
+                        str = String.Format("funcname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._FuncParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncParam.num/3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._FuncParam.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncParam.num/3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._FuncParam.ByteTable[j] = temp.ToString();
+                    }
+                }
+                else if (k == 10)      //读系统保护参数表
+                {
+                    GetPrivateProfileString("NUM", "RYBPARAMNUM", "无法读取对应数值！",
+                                                         temp, 255, fname);
+                    PublicDataClass._FuncConfigParam.num = int.Parse(temp.ToString());                    //转换为整型
+                    PublicDataClass._FuncConfigParam.num = PublicDataClass._FuncConfigParam.num / 3;
+                    PublicDataClass._FuncConfigParam.NameTable = new string[PublicDataClass._FuncConfigParam.num];
+                    PublicDataClass._FuncConfigParam.ValueTable = new string[PublicDataClass._FuncConfigParam.num];
+                    PublicDataClass._FuncConfigParam.ByteTable = new string[PublicDataClass._FuncConfigParam.num];
+
+                    for (int j = 0; j < PublicDataClass._FuncConfigParam.num ; j++)
+                    {
+                        str = String.Format("rybname_{0:d}", j);
+
+                        GetPrivateProfileString("NAMETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._FuncConfigParam.NameTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncConfigParam.num ; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        GetPrivateProfileString("VALUETABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._FuncConfigParam.ValueTable[j] = temp.ToString();
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncConfigParam.num ; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+
+                        GetPrivateProfileString("BEILVTABLE", str, "无法读取对应数值！",
+                                                     temp, 255, fname);
+                        PublicDataClass._FuncConfigParam.ByteTable[j] = temp.ToString();
+                    }
+                }
+                
+
+            }
+            else                    //写
+            {
+                if (k == 0)   //网络参数
+                {
+                    str = Convert.ToString(PublicDataClass._NetParam.num);
+                    WritePrivateProfileString("NUM", "NETPARAMNUM", str, fname);
+                    for (int j = 0; j < PublicDataClass._NetParam.num; j++)
+                    {
+                        str = String.Format("netparam_{0:d}", j);
+                        if(j==0)
+                             WritePrivateProfileString("TABLE", str, Convert.ToString(PublicDataClass._NetParam.IP), fname);
+                        else if (j == 1)
+                             WritePrivateProfileString("TABLE", str, Convert.ToString(PublicDataClass._NetParam.GwIP), fname);
+                        else if (j == 2)
+                             WritePrivateProfileString("TABLE", str, Convert.ToString(PublicDataClass._NetParam.SubMask), fname);
+                        else if (j == 3)
+                             WritePrivateProfileString("TABLE", str, Convert.ToString(PublicDataClass._NetParam.Port), fname);
+                        else if (j == 4)
+                             WritePrivateProfileString("TABLE", str, Convert.ToString(PublicDataClass._NetParam.SrcHA), fname);
+                    }
+                }
+                else if (k == 1)   //串口参数
+                {
+                    str = Convert.ToString(PublicDataClass._ComParam.num);
+                    WritePrivateProfileString("NUM", "COMPARAMNUM", str, fname);
+
+
+                    for (int j = 0; j < PublicDataClass._ComParam.num / 3; j++)
+                    {
+                        WritePrivateProfileString("BAUDRATE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("JY", null, null, fname);
+                        WritePrivateProfileString("DATABIT", null, null, fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._ComParam.num / 3; j++)
+                    {
+                        str = String.Format("baudrate_{0:d}", j);
+
+                        WritePrivateProfileString("BAUDRATE", str, Convert.ToString(PublicDataClass._ComParam.BaudRateTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._ComParam.num / 3; j++)
+                    {
+                        str = String.Format("jy_{0:d}", j);
+
+                        WritePrivateProfileString("JY", str, Convert.ToString(PublicDataClass._ComParam.JyTable[j]), fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._ComParam.num / 3; j++)
+                    {
+                        str = String.Format("databit_{0:d}", j);
+
+                        WritePrivateProfileString("DATABIT", str, Convert.ToString(PublicDataClass._ComParam.DataBitTable[j]), fname);
+                    }
+
+                }
+                else if (k == 2)   //系统参数
+                {
+
+                    //Ini ini = new Ini(path + "\\Set.ini ");
+
+                    //ini.IniWriteValue("Main ", "Form   String ", "Something "); 
+                    //WritePrivateProfileString(sectionName, null, null, this.path);
+                    //WritePrivateProfileString(sectionName, keyName, null, this.path);
+                    str = Convert.ToString(PublicDataClass._SysParam.num);
+
+                    WritePrivateProfileString("NUM", "SYSPARAMNUM", str, fname);
+
+
+                    for (int j = 0; j < PublicDataClass._SysParam.num / 3; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("VALUETABLE", null, null, fname);
+                        WritePrivateProfileString("BEILVTABLE", null, null, fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._SysParam.num / 3; j++)
+                    {
+                        str = String.Format("syename_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._SysParam.NameTable[j]), fname);
+
+
+                    }
+                    for (int j = 0; j < PublicDataClass._SysParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        WritePrivateProfileString("VALUETABLE", str, Convert.ToString(PublicDataClass._SysParam.ValueTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._SysParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+                        WritePrivateProfileString("BEILVTABLE", str, Convert.ToString(PublicDataClass._SysParam.ByteTable[j]), fname);
+                    }
+                }
+                else if (k == 9)      //写系统保护参数表
+                {
+                    str = Convert.ToString(PublicDataClass._FuncParam.num);
+
+                    WritePrivateProfileString("NUM", "FUNCPARAMNUM", str, fname);
+
+
+                    for (int j = 0; j < PublicDataClass._FuncParam.num / 3; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("VALUETABLE", null, null, fname);
+                        WritePrivateProfileString("BEILVTABLE", null, null, fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncParam.num / 3; j++)
+                    {
+                        str = String.Format("funcname_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._FuncParam.NameTable[j]), fname);
+
+
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncParam.num / 3; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        WritePrivateProfileString("VALUETABLE", str, Convert.ToString(PublicDataClass._FuncParam.ValueTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncParam.num / 3; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+                        WritePrivateProfileString("BEILVTABLE", str, Convert.ToString(PublicDataClass._FuncParam.ByteTable[j]), fname);
+                    }
+
+                }
+                else if (k == 10)      //写功能配置参数表
+                {
+                    str = Convert.ToString(PublicDataClass._FuncConfigParam.num*3);
+
+                    WritePrivateProfileString("NUM", "RYBPARAMNUM", str, fname);
+
+
+                    for (int j = 0; j < PublicDataClass._FuncConfigParam.num ; j++)
+                    {
+                        WritePrivateProfileString("NAMETABLE", null, null, fname);     //先清除掉
+                        WritePrivateProfileString("VALUETABLE", null, null, fname);
+                        WritePrivateProfileString("BEILVTABLE", null, null, fname);
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncConfigParam.num ; j++)
+                    {
+                        str = String.Format("rybname_{0:d}", j);
+
+                        WritePrivateProfileString("NAMETABLE", str, Convert.ToString(PublicDataClass._FuncConfigParam.NameTable[j]), fname);
+
+
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncConfigParam.num ; j++)
+                    {
+                        str = String.Format("value_{0:d}", j);
+
+                        WritePrivateProfileString("VALUETABLE", str, Convert.ToString(PublicDataClass._FuncConfigParam.ValueTable[j]), fname);
+
+                    }
+                    for (int j = 0; j < PublicDataClass._FuncConfigParam.num ; j++)
+                    {
+                        str = String.Format("beilv_{0:d}", j);
+                        WritePrivateProfileString("BEILVTABLE", str, Convert.ToString(PublicDataClass._FuncConfigParam.ByteTable[j]), fname);
+                    }
+
+                }
+            }
+
+
+        }
+
+        /*************************************************************************
+       *  函数名：    ReadDynOptFile                                    *
+       *  功能  ：    读动态选项卡配置文件                                     *
+       *  参数  ：    fname ：路径名  
+       *                                 Type=1  读
+       *                                 Type=2   写*
+       *                                                   *
+       *  返回值：    无                                                       *
+       *  修改日期：  2012-5-18                                              *
+       *  作者    ：  liuhch                                                  *
+       * **********************************************************************/
+        public static void ReadDynOptFile(string fname, int k, byte Type)
+        {
+            string namestr, valuestr;
+            if (Type == 1)//动态添加选项卡，读
+            {
+
+
+                GetPrivateProfileString("PAGENAME", "PageName", "无法读取对应数值！",
+                                                     temp, 255, fname);
+
+                PublicDataClass.TabCfg[k].PageName = temp.ToString();//选项卡名称
+                GetPrivateProfileString("LINENUM", "LineNum", "无法读取对应数值！",
+                                                temp, 255, fname);
+                PublicDataClass.TabCfg[k].LineNum = int.Parse(temp.ToString());       //行数     
+                GetPrivateProfileString("COLLUMNNUM", "ColumnNum", "无法读取对应数值！",
+                                         temp, 255, fname);
+                PublicDataClass.TabCfg[k].ColumnNum = int.Parse(temp.ToString());       //列数
+                PublicDataClass.TabCfg[k].ColumnPageName = new string[PublicDataClass.TabCfg[k].ColumnNum];
+                PublicDataClass.TabCfg[k].TabPageValue = new PublicDataClass.TabPageValueTable[PublicDataClass.TabCfg[k].ColumnNum];
+
+                for (int j = 0; j < PublicDataClass.TabCfg[k].ColumnNum; j++)   //列名称
+                {
+                    str = String.Format("ColumnPageName_{0:d}", j);
+
+                    GetPrivateProfileString("COLLUMNPAGENAME", str, "无法读取对应数值！",
+                                                 temp, 255, fname);
+                    PublicDataClass.TabCfg[k].ColumnPageName[j] = temp.ToString();
+                }
+
+                for (int j = 0; j < PublicDataClass.TabCfg[k].ColumnNum; j++)
+                {
+                    namestr = String.Format("ColumnValueTable_{0:d}", j);
+                    PublicDataClass.TabCfg[k].TabPageValue[j].ValueTable = new string[PublicDataClass.TabCfg[k].LineNum];
+                    for (int q = 0; q < PublicDataClass.TabCfg[k].LineNum; q++)
+                    {
+
+                        valuestr = String.Format("ValueTable_{0:d}", q);
+
+                        GetPrivateProfileString(namestr, valuestr, "无法读取对应数值！",
+                                                      temp, 255, fname);
+                        PublicDataClass.TabCfg[k].TabPageValue[j].ValueTable[q] = temp.ToString();
+
+
+                    }
+                }
+                GetPrivateProfileString("PARAMINFOADDR", "ParamInfoAddr", "无法读取对应数值！",
+                                                   temp, 255, fname);
+
+                PublicDataClass.TabCfg[k].DownAddr = int.Parse(temp.ToString());   //下载地址
+
+            }
+            else//动态添加选项卡，写
+            {
+                str = Convert.ToString(PublicDataClass.TabCfg[k].LineNum);  //行数
+                WritePrivateProfileString("LINENUM", "LineNum", str, fname);
+
+
+                for (int q = 0; q < PublicDataClass.TabCfg[k].LineNum; q++)
+                {
+
+                    for (int j = 0; j < PublicDataClass.TabCfg[k].ColumnNum; j++)
+                    {
+                        namestr = String.Format("ColumnValueTable_{0:d}", j);
+                        WritePrivateProfileString(namestr, null, null, fname);     //先清除掉
+                    }
+                }
+
+                for (int j = 0; j < PublicDataClass.TabCfg[k].ColumnNum; j++)
+                {
+                    namestr = String.Format("ColumnValueTable_{0:d}", j);
+
+                    for (int q = 0; q < PublicDataClass.TabCfg[k].LineNum; q++)
+                    {
+                        valuestr = String.Format("ValueTable_{0:d}", q);
+                        WritePrivateProfileString(namestr, valuestr, Convert.ToString(PublicDataClass.TabCfg[k].TabPageValue[j].ValueTable[q]), fname);
+                    }
+                }
+
+
+            }
+        }
+    }
+}

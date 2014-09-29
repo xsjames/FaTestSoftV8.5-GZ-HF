@@ -1,0 +1,273 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using KD.WinFormsUI.Docking;
+using FaTestSoft.CommonData;
+using FaTestSoft.FUNCTIONCLASS;
+
+namespace FaTestSoft
+{
+    public partial class ChangeInfoViewDocment : DockContent
+    {
+        public ChangeInfoViewDocment()
+        {
+            InitializeComponent();
+        }
+        ListViewItem lv;
+
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            int dex =0;
+            if (PublicDataClass._Message.YueXianEvent == true)
+            {
+                PublicDataClass._Message.YueXianEvent = false;
+                
+                for (int i = 0; i < PublicDataClass._DataField.FieldVSQ; i++)
+                {
+                    int StartAddr = 0; string DataInfo = @"";
+                    StartAddr = PublicDataClass._DataField.Buffer[dex + 2];
+                    StartAddr = StartAddr << 16;
+                    StartAddr += PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8);
+
+                    lv = new ListViewItem(String.Format("{0:d}", listView1.Items.Count));
+                    lv.SubItems.Add("<越限>");
+
+                    lv.SubItems.Add(Convert.ToString(PublicDataClass.ThreeYNameTable.YcTable[StartAddr - 0x4001]));   //加入名称
+
+                    
+                    lv.SubItems.Add(String.Format("(0-正常，1-越上限，2-越下限)：{0:d}", PublicDataClass._DataField.Buffer[3]));  //状态
+                    DataInfo = "";
+                    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 10]);   //年
+                    DataInfo += "年";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 9]);  //月
+                    DataInfo += "月";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 8]);  //日+星期
+                    DataInfo += "日";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 7]);  //时
+                    DataInfo += "时";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 6]);  //分
+                    DataInfo += "分";
+
+                    lv.SubItems.Add(DataInfo);
+                    lv.SubItems.Add(String.Format("{0:d}", (PublicDataClass._DataField.Buffer[dex + 5] << 8) + PublicDataClass._DataField.Buffer[dex + 4]));
+                    listView1.Items.Add(lv);
+                    dex +=11;
+                }
+            }
+            else if (PublicDataClass._Message.YxBianWeiOfNoTimeEvent == true)
+            {
+                PublicDataClass._Message.YxBianWeiOfNoTimeEvent = false;
+                for (int i = 0; i < PublicDataClass._DataField.FieldVSQ; i++)
+                {
+                    int StartAddr = 0;
+                    StartAddr = PublicDataClass._DataField.Buffer[dex+2];
+                    StartAddr = StartAddr << 16;
+                    StartAddr += PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex+1] << 8);
+
+                    lv = new ListViewItem(String.Format("{0:d}", listView1.Items.Count));
+                    lv.SubItems.Add("<遥信变位>");
+                    lv.SubItems.Add(Convert.ToString(PublicDataClass.ThreeYNameTable.YxTable[StartAddr - 1]));   //加入名称
+
+                    lv.SubItems.Add(String.Format("(0-分，1-合)：{0:d}", PublicDataClass._DataField.Buffer[dex+3]));  //状态
+                 
+                    lv.SubItems.Add("无");
+                    lv.SubItems.Add("无");
+                    listView1.Items.Add(lv);
+                    dex += 4;
+                }
+            }
+            else if (PublicDataClass._Message.YxBianWeiOfTimeEvent == true)
+            {
+                PublicDataClass._Message.YxBianWeiOfTimeEvent = false;
+                for (int i = 0; i < PublicDataClass._DataField.FieldVSQ; i++)
+                {
+                    int StartAddr = 0; string DataInfo = @"";
+                    StartAddr = PublicDataClass._DataField.Buffer[dex + 2];
+                    StartAddr = StartAddr << 16;
+                    StartAddr += PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8);
+
+                    lv = new ListViewItem(String.Format("{0:d}", listView1.Items.Count));
+                    lv.SubItems.Add("<遥信变位>");
+                    lv.SubItems.Add(Convert.ToString(PublicDataClass.ThreeYNameTable.YxTable[StartAddr - 1]));   //加入名称
+
+                    lv.SubItems.Add(String.Format("(0-分，1-合)：{0:d}", PublicDataClass._DataField.Buffer[dex + 3]));  //状态
+
+                    DataInfo = "";
+                    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 10]);   //年
+                    DataInfo += "年";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 9]);  //月
+                    DataInfo += "月";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 8] );  //日
+                    DataInfo += "日";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 7]);  //时
+                    DataInfo += "时";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 6]);  //分
+                    DataInfo += "分";
+                  
+                    lv.SubItems.Add(DataInfo);
+                    lv.SubItems.Add(String.Format("{0:d}", (PublicDataClass._DataField.Buffer[dex + 5] << 8) + PublicDataClass._DataField.Buffer[dex + 4]));
+                    listView1.Items.Add(lv);
+                    dex += 11;
+                }
+            }
+            else if (PublicDataClass._Message.RaoDongEvent == true)
+            {
+                byte[] bytes = new byte[4];
+                PublicDataClass._Message.RaoDongEvent = false;
+                for (int i = 0; i < PublicDataClass._DataField.FieldVSQ; i++)
+                {
+                    int StartAddr = 0;
+                    StartAddr = PublicDataClass._DataField.Buffer[dex + 2];
+                    StartAddr = StartAddr << 16;
+                    StartAddr += PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8);
+
+                    lv = new ListViewItem(String.Format("{0:d}", listView1.Items.Count));
+                    lv.SubItems.Add("<死区>");
+                    lv.SubItems.Add(Convert.ToString(PublicDataClass.ThreeYNameTable.YcTable[StartAddr - 0x4001]));   //加入名称
+
+                    //int data = (PublicDataClass._DataField.Buffer[dex + 4] << 8) + PublicDataClass._DataField.Buffer[dex + 3];
+                    //if (data > 0x8000)
+                        //data = data - 65536;
+                    bytes[0] = PublicDataClass._DataField.Buffer[dex + 3];
+                    bytes[1] = PublicDataClass._DataField.Buffer[dex + 4];
+                    bytes[2] = PublicDataClass._DataField.Buffer[dex + 5];
+                    bytes[3] = PublicDataClass._DataField.Buffer[dex + 6];
+
+                    float fdata = BitConverter.ToSingle(bytes, 0);  //转换为浮点
+
+                    lv.SubItems.Add(Convert.ToString(String.Format("{0:f4}", fdata)));
+
+                    lv.SubItems.Add("无");
+                    lv.SubItems.Add("无");
+                    listView1.Items.Add(lv);
+                    dex += 8;
+                }
+
+
+            }
+            else if (PublicDataClass._Message.PowOffEvent == true)
+            {
+                string DataInfo = @"";
+                PublicDataClass._Message.PowOffEvent = false;
+                lv = new ListViewItem(String.Format("{0:d}", listView1.Items.Count));
+                lv.SubItems.Add("<停电事件>");
+                DataInfo = "";
+                DataInfo += "发生的时间:";
+                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex]);   //年
+                DataInfo += "年";
+                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 1]);  //月
+                DataInfo += "月";
+                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 2]);  //日
+                DataInfo += "日";
+                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 3]);  //时
+                DataInfo += "时";
+                DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 4]);  //分
+                DataInfo += "分";
+                lv.SubItems.Add(DataInfo);
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                listView1.Items.Add(lv);
+                dex = 5;
+                for (int i = 0; i < PublicDataClass._DataField.FieldVSQ; i++)
+                {
+                    int StartAddr = 0;
+                    StartAddr = PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8);
+                    lv = new ListViewItem(String.Format("{0:d}", listView1.Items.Count));
+                    lv.SubItems.Add("<遥测量>");
+                    lv.SubItems.Add(Convert.ToString(PublicDataClass.ThreeYNameTable.YcTable[StartAddr - 0x4001]));   //加入名称
+
+                    int data = (PublicDataClass._DataField.Buffer[dex + 3] << 8) + PublicDataClass._DataField.Buffer[dex + 2];
+                    if (data > 0x8000)
+                        data = data - 65536;
+                    lv.SubItems.Add(Convert.ToString(data));
+
+                    lv.SubItems.Add("无");
+                    lv.SubItems.Add("无");
+                    listView1.Items.Add(lv);
+                    dex += 4;
+                }
+            }
+            else if (PublicDataClass._Message.FaultEvent == true)  //故障事件
+            {
+                PublicDataClass._Message.FaultEvent = false;
+                for (int i = 0; i < PublicDataClass._DataField.FieldVSQ; i++)
+                {
+                    int StartAddr = 0; string DataInfo = @"";
+                    StartAddr = PublicDataClass._DataField.Buffer[dex + 2];
+                    StartAddr = StartAddr << 16;
+                    StartAddr += PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8);
+
+                    lv = new ListViewItem(String.Format("{0:d}", listView1.Items.Count));
+                    lv.SubItems.Add("<故障事件>");
+
+                    DataInfo = String.Format("第[{0:d}]路 --", StartAddr);
+                    if (PublicDataClass._DataField.Buffer[dex + 3] == 1)
+                        DataInfo += "A相接地";
+                    else if (PublicDataClass._DataField.Buffer[dex + 3] == 2)
+                        DataInfo += "B相接地";
+                    else if (PublicDataClass._DataField.Buffer[dex + 3] == 3)
+                        DataInfo += "C相接地";
+                    else if (PublicDataClass._DataField.Buffer[dex + 3] == 4)
+                        DataInfo += "AB相短路";
+                    else if (PublicDataClass._DataField.Buffer[dex + 3] == 5)
+                        DataInfo += "AC相短路";
+                    else if (PublicDataClass._DataField.Buffer[dex + 3] == 6)
+                        DataInfo += "BC相短路";
+                    else if (PublicDataClass._DataField.Buffer[dex + 3] == 7)
+                        DataInfo += "AB相接地";
+                    else if (PublicDataClass._DataField.Buffer[dex + 3] == 8)
+                        DataInfo += "BC相接地";
+                    else if (PublicDataClass._DataField.Buffer[dex + 3] == 9)
+                        DataInfo += "CA相接地";
+                    lv.SubItems.Add(DataInfo);   //加入名称
+                    DataInfo = @"";
+
+                    lv.SubItems.Add(String.Format("(0-恢复，1-发生)：{0:d}", PublicDataClass._DataField.Buffer[dex + 4]));  //状态
+
+                    DataInfo = String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 5]);   //年
+                    DataInfo += "年";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 6]);  //月
+                    DataInfo += "月";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 7]);  //日
+                    DataInfo += "日";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 8]);  //时
+                    DataInfo += "时";
+                    DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 9]);  //分
+                    DataInfo += "分";
+
+                    lv.SubItems.Add(DataInfo);
+                    DataInfo = @"";
+                    DataInfo = String.Format("{0:d}", (PublicDataClass._DataField.Buffer[dex + 10] << 8) + PublicDataClass._DataField.Buffer[dex + 11]);  //分
+                    lv.SubItems.Add(DataInfo);
+                    listView1.Items.Add(lv);
+                    dex += 12;
+                }
+            }
+        }
+
+        private void buttonclear_Click(object sender, EventArgs e)
+        {
+            listView1.Items.Clear();
+        }
+
+        private void ChangeInfoViewDocment_Activated(object sender, EventArgs e)
+        {
+            timer1.Enabled = true;
+        }
+
+        private void ChangeInfoViewDocment_Deactivate(object sender, EventArgs e)
+        {
+            timer1.Enabled = false;
+        }
+
+        
+    }
+}

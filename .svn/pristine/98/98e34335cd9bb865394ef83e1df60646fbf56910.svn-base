@@ -1,0 +1,204 @@
+﻿namespace FaTestSoft
+{
+    partial class AddParamRecordViewForm1
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.textBoxname = new System.Windows.Forms.TextBox();
+            this.textBoxBusNum = new System.Windows.Forms.TextBox();
+            this.textBoxCardNum = new System.Windows.Forms.TextBox();
+            this.comboBoxUBusConnectionmode = new System.Windows.Forms.ComboBox();
+            this.comboBoxIBusConnectionmode = new System.Windows.Forms.ComboBox();
+            this.buttonok = new System.Windows.Forms.Button();
+            this.buttoncancel = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(18, 20);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(83, 12);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "名        称:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(18, 59);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(83, 12);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "母   线   号:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(18, 97);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(83, 12);
+            this.label3.TabIndex = 1;
+            this.label3.Text = "板   卡   号:";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(18, 139);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(83, 12);
+            this.label4.TabIndex = 1;
+            this.label4.Text = "电压母线接法:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(18, 183);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(83, 12);
+            this.label5.TabIndex = 1;
+            this.label5.Text = "电流母线接法:";
+            // 
+            // textBoxname
+            // 
+            this.textBoxname.Location = new System.Drawing.Point(133, 11);
+            this.textBoxname.Name = "textBoxname";
+            this.textBoxname.Size = new System.Drawing.Size(147, 21);
+            this.textBoxname.TabIndex = 2;
+            // 
+            // textBoxBusNum
+            // 
+            this.textBoxBusNum.Location = new System.Drawing.Point(133, 50);
+            this.textBoxBusNum.Name = "textBoxBusNum";
+            this.textBoxBusNum.Size = new System.Drawing.Size(147, 21);
+            this.textBoxBusNum.TabIndex = 2;
+            this.textBoxBusNum.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxBusNum_KeyPress);
+            // 
+            // textBoxCardNum
+            // 
+            this.textBoxCardNum.Location = new System.Drawing.Point(133, 88);
+            this.textBoxCardNum.Name = "textBoxCardNum";
+            this.textBoxCardNum.Size = new System.Drawing.Size(147, 21);
+            this.textBoxCardNum.TabIndex = 2;
+            this.textBoxCardNum.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxCardNum_KeyPress);
+            // 
+            // comboBoxUBusConnectionmode
+            // 
+            this.comboBoxUBusConnectionmode.FormattingEnabled = true;
+            this.comboBoxUBusConnectionmode.Items.AddRange(new object[] {
+            "Y型",
+            "V型"});
+            this.comboBoxUBusConnectionmode.Location = new System.Drawing.Point(133, 131);
+            this.comboBoxUBusConnectionmode.Name = "comboBoxUBusConnectionmode";
+            this.comboBoxUBusConnectionmode.Size = new System.Drawing.Size(147, 20);
+            this.comboBoxUBusConnectionmode.TabIndex = 3;
+            this.comboBoxUBusConnectionmode.Text = "Y型";
+            // 
+            // comboBoxIBusConnectionmode
+            // 
+            this.comboBoxIBusConnectionmode.FormattingEnabled = true;
+            this.comboBoxIBusConnectionmode.Items.AddRange(new object[] {
+            "Y型",
+            "V型"});
+            this.comboBoxIBusConnectionmode.Location = new System.Drawing.Point(133, 175);
+            this.comboBoxIBusConnectionmode.Name = "comboBoxIBusConnectionmode";
+            this.comboBoxIBusConnectionmode.Size = new System.Drawing.Size(147, 20);
+            this.comboBoxIBusConnectionmode.TabIndex = 3;
+            this.comboBoxIBusConnectionmode.Text = "Y型";
+            // 
+            // buttonok
+            // 
+            this.buttonok.Location = new System.Drawing.Point(26, 234);
+            this.buttonok.Name = "buttonok";
+            this.buttonok.Size = new System.Drawing.Size(88, 23);
+            this.buttonok.TabIndex = 4;
+            this.buttonok.Text = "确定";
+            this.buttonok.UseVisualStyleBackColor = true;
+            this.buttonok.Click += new System.EventHandler(this.buttonok_Click);
+            // 
+            // buttoncancel
+            // 
+            this.buttoncancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.buttoncancel.Location = new System.Drawing.Point(175, 234);
+            this.buttoncancel.Name = "buttoncancel";
+            this.buttoncancel.Size = new System.Drawing.Size(89, 23);
+            this.buttoncancel.TabIndex = 4;
+            this.buttoncancel.Text = "取消";
+            this.buttoncancel.UseVisualStyleBackColor = true;
+            this.buttoncancel.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // AddParamRecordViewForm1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.InactiveCaptionText;
+            this.ClientSize = new System.Drawing.Size(314, 284);
+            this.Controls.Add(this.buttoncancel);
+            this.Controls.Add(this.buttonok);
+            this.Controls.Add(this.comboBoxIBusConnectionmode);
+            this.Controls.Add(this.comboBoxUBusConnectionmode);
+            this.Controls.Add(this.textBoxCardNum);
+            this.Controls.Add(this.textBoxBusNum);
+            this.Controls.Add(this.textBoxname);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "AddParamRecordViewForm1";
+            this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "添加参数记录";
+            this.Load += new System.EventHandler(this.AddParamRecordViewForm1_Load);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox textBoxname;
+        private System.Windows.Forms.TextBox textBoxBusNum;
+        private System.Windows.Forms.TextBox textBoxCardNum;
+        private System.Windows.Forms.ComboBox comboBoxUBusConnectionmode;
+        private System.Windows.Forms.ComboBox comboBoxIBusConnectionmode;
+        private System.Windows.Forms.Button buttonok;
+        private System.Windows.Forms.Button buttoncancel;
+    }
+}

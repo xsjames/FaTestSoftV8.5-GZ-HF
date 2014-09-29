@@ -1,0 +1,977 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using KD.WinFormsUI.Docking;
+using FaTestSoft.CommonData;
+using FaTestSoft.FUNCTIONCLASS;
+
+namespace FaTestSoft
+{
+    public partial class SysPDocmentView : DockContent
+    {
+        public SysPDocmentView()
+        {
+            InitializeComponent();
+        }
+        private Control[] Editors;
+
+        [DllImport("DataConVert.dll")]
+          private static extern void InttoByte(int source, ref byte pdata);
+
+        FibreParamForm FibrePfm = new FibreParamForm();
+        GprsParamForm GprsPfm = new GprsParamForm();
+        ComParamForm ComPfm = new ComParamForm();
+        fsxbh FsxPfm = new fsxbh();
+        DeviceParamForm DevicePfm = new DeviceParamForm();
+        private static byte NowMenuIndex = 1;                      //当前画面号
+        private int num = 0;
+        private int ty;
+
+        private void SysPDocmentView_Load(object sender, EventArgs e)
+        {
+             byte i = 0;
+
+
+             Editors = new Control[] {
+	                                textBoxvalue,
+									textBoxvalue,			// for column 1
+                                    textBoxvalue,
+									};
+
+            if (PublicDataClass.SaveText.devicenum == 0)
+            {
+                comboBox1.Text = "无信息";
+
+            }
+            else
+            {
+                for (i = 0; i < PublicDataClass.SaveText.devicenum; i++)
+                {
+                    comboBox1.Items.Add(PublicDataClass.SaveText.Device[i].PointName);
+                }
+                comboBox1.Text = PublicDataClass.SaveText.Device[0].PointName;
+
+            }
+            num = PublicDataClass.SaveText.devicenum;
+
+            tabPage1.Controls.Clear();
+            
+            FibrePfm.TopLevel = false;
+            tabPage1.Controls.Add(FibrePfm);
+
+            FibrePfm.StartPosition = FormStartPosition.Manual;  //修改窗体的起始位置 后才能修改top和left
+            FibrePfm.Top = 0;
+
+            FibrePfm.Left = 0;
+            FibrePfm.Width = this.Width;
+            FibrePfm.Height = this.Height;
+
+            FibrePfm.Show();
+        }
+
+        private void tabControl1_SizeChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void downloadbutton_Click(object sender, EventArgs e)
+        {
+            if (comboBox1.Text == "无信息")
+            {
+                MessageBox.Show("无测量点信息可操作", "信息",
+                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+
+            }
+            else
+            {
+                ty = PublicFunction.CheckPointOfCommunicationEntrace(comboBox1.Text);
+                if (ty == 0)
+                {
+                    MessageBox.Show("无测量点信息可操作", "信息",MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+
+                }
+                
+            }
+            string text = @"";
+            PublicDataClass._DataField.FieldLen  = 0;
+            PublicDataClass._DataField.FieldVSQ  = 0;
+            if (NowMenuIndex == 1)  //下载网络参数
+            {
+                text = PublicDataClass._NetParam.IP;
+                for (byte i = 0; i < 4; i++)
+                {
+                    if (i < 3)
+                    {
+                        int a = text.IndexOf(".");
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text.Substring(0, a));
+                        text = text.Remove(0, a + 1);
+                    }
+                    else
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text);
+                    PublicDataClass._DataField.FieldLen++;
+                    
+                }
+                text = PublicDataClass._NetParam.GwIP;
+                for (byte i = 0; i < 4; i++)
+                {
+                    if (i < 3)
+                    {
+                        int a = text.IndexOf(".");
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text.Substring(0, a));
+                        text = text.Remove(0, a + 1);
+                    }
+                    else
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text);
+                    PublicDataClass._DataField.FieldLen++;
+
+                }
+                text = PublicDataClass._NetParam.SubMask;
+                for (byte i = 0; i < 4; i++)
+                {
+                    if (i < 3)
+                    {
+                        int a = text.IndexOf(".");
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text.Substring(0, a));
+                        text = text.Remove(0, a + 1);
+                    }
+                    else
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text);
+                    PublicDataClass._DataField.FieldLen++;
+
+                }
+
+                InttoByte(Convert.ToInt16(PublicDataClass._NetParam.Port), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                PublicDataClass._DataField.FieldLen += 2;
+
+                text = PublicDataClass._NetParam.SrcHA;
+                for (byte i = 0; i < 6; i++)
+                {
+                    if (i < 5)
+                    {
+                        int   a   = text.IndexOf("-");
+                        string cs = text.Substring(0, a);
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] =PublicFunction. StringToByte(cs);
+                        
+                        //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(text.Substring(0, a)));
+                        text = text.Remove(0, a + 1);
+                    }
+                    else
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.StringToByte(text);
+                    PublicDataClass._DataField.FieldLen++;
+
+                }
+                PublicDataClass._DataField.FieldVSQ = 5;
+                PublicDataClass.ParamInfoAddr = 0x5001 + PublicDataClass.NetIndex;
+            }
+            else if (NowMenuIndex == 2)     //GPRS参数
+            {
+                text = PublicDataClass._GprsParam.IP;
+                for (byte i = 0; i < 4; i++)
+                {
+                    if (i < 3)
+                    {
+                        int a = text.IndexOf(".");
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text.Substring(0, a));
+                        text = text.Remove(0, a + 1);
+                    }
+                    else
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text);
+                    PublicDataClass._DataField.FieldLen++;
+
+                }
+                text = PublicDataClass._GprsParam.BIP;
+                for (byte i = 0; i < 4; i++)
+                {
+                    if (i < 3)
+                    {
+                        int a = text.IndexOf(".");
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text.Substring(0, a));
+                        text = text.Remove(0, a + 1);
+                    }
+                    else
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(text);
+                    PublicDataClass._DataField.FieldLen++;
+
+                }
+                InttoByte(Convert.ToInt16(PublicDataClass._GprsParam.Port), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                PublicDataClass._DataField.FieldLen += 2;
+
+                InttoByte(Convert.ToInt16(PublicDataClass._GprsParam.BPort), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                PublicDataClass._DataField.FieldLen += 2;
+
+                InttoByte(Convert.ToInt16(PublicDataClass._GprsParam.Heart), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                PublicDataClass._DataField.FieldLen += 2;
+
+                for (byte i = 0; i < PublicDataClass._GprsParam.APN.Length; i++)
+                {
+        
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._GprsParam.APN[i]);
+                    PublicDataClass._DataField.FieldLen++;
+                }
+
+                PublicDataClass._DataField.FieldVSQ = 6;
+                //PublicDataClass.ParamInfoAddr = 0x5002;
+
+            }
+            else if (NowMenuIndex == 3)   //串口参数
+            {
+                for (byte i = 0; i < 4; i++)
+                {
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._ComParam.BaudRateTable[i]);
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._ComParam.JyTable[i]);
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._ComParam.DataBitTable[i]);
+                    PublicDataClass._DataField.FieldLen++;
+                }
+                PublicDataClass._DataField.FieldVSQ = 4;
+                PublicDataClass.ParamInfoAddr = 0x5200;
+            }
+            else if (NowMenuIndex == 4)   //系统参数
+            {
+                for (byte i = 0; i < PublicDataClass._SysParam.num; i++)
+                {
+                    if (PublicDataClass._SysParam.ByteTable[i] == "1")
+                    {
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._SysParam.ValueTable[i]);
+                        PublicDataClass._DataField.FieldLen++;
+                        
+                    }
+                    else if (PublicDataClass._SysParam.ByteTable[i] == "2")
+                    {
+                        InttoByte(Convert.ToInt32(PublicDataClass._SysParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                        PublicDataClass._DataField.FieldLen += 2;
+                    }
+                    PublicDataClass._DataField.FieldVSQ++;
+                }
+                PublicDataClass.ParamInfoAddr = 0x5100;
+            }
+            else if (NowMenuIndex == 5)   //运行参数
+            {
+                for (byte i = 0; i < PublicDataClass._RunParam.num; i++)
+                {
+                    if (PublicDataClass._RunParam.ByteTable[i] == "1")
+                    {
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._RunParam.ValueTable[i]);
+                        PublicDataClass._DataField.FieldLen++;
+
+                    }
+                    else if (PublicDataClass._RunParam.ByteTable[i] == "2")
+                    {
+                        InttoByte(Convert.ToInt16(PublicDataClass._RunParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                        PublicDataClass._DataField.FieldLen += 2;
+                    }
+                    PublicDataClass._DataField.FieldVSQ++;
+                }
+                PublicDataClass.ParamInfoAddr = 0x5005;
+            }
+            else if (NowMenuIndex == 6)   //系统保护参数
+            {
+                 for (byte i = 0; i < PublicDataClass._FuncParam.num/3; i++)
+                 {
+                     if (PublicDataClass._FuncParam.ByteTable[i] == "1")
+                     {
+ 
+                             PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._FuncParam.ValueTable[i]);
+                        
+                             PublicDataClass._DataField.FieldLen++;
+                         
+
+                     }
+                     else if (PublicDataClass._FuncParam.ByteTable[i] == "2")
+                     {
+                         InttoByte(Convert.ToInt16(PublicDataClass._FuncParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                         PublicDataClass._DataField.FieldLen += 2;
+                     }
+                     PublicDataClass._DataField.FieldVSQ++;
+                 }
+                 PublicDataClass.ParamInfoAddr = 0x5700;
+            }
+            else if (NowMenuIndex == 7)   //软压板配置参数
+            {
+                int i = 0; int j = 0; int addr;
+                foreach (ListViewItem tempItem in listView1.Items)//循环遍历listView控件中的每一项
+                {
+                    if (tempItem.Checked == true)
+                    {
+                        addr = 0x8001 + i;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(addr & 0x00ff);
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = Convert.ToByte((addr & 0xff00) >> 8);
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 2] = 0;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 3] = Convert.ToByte(PublicDataClass._FuncConfigParam.ValueTable[i]);
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 4] = 0;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 5] = 0;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 6] = 0; 
+                        PublicDataClass._DataField.FieldLen +=7;
+                        PublicDataClass._DataField.FieldVSQ++;
+                    }
+                    i++;
+                }
+                //for (byte i = 0; i < PublicDataClass._FuncConfigParam.num; i++)
+                //{
+                //    if (PublicDataClass._FuncConfigParam.ByteTable[i] == "1")
+                //    {
+                //        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._FuncConfigParam.ValueTable[i]);
+                //        PublicDataClass._DataField.FieldLen++;
+
+                //    }
+                //    else if (PublicDataClass._FuncConfigParam.ByteTable[i] == "2")
+                //    {
+                //        InttoByte(Convert.ToInt16(PublicDataClass._FuncConfigParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                //        PublicDataClass._DataField.FieldLen += 2;
+                //    }
+                //    PublicDataClass._DataField.FieldVSQ++;
+                //}
+                //PublicDataClass.ParamInfoAddr = 0x5800;
+            }
+            else if (NowMenuIndex == 8)   //反时限保护参数
+            {
+
+                byte[] b = BitConverter.GetBytes(float.Parse(PublicDataClass._FsxParam.IdataValue));
+
+                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = b[0];
+                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = b[1];
+                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 2] = b[2];
+                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 3] = b[3];
+                PublicDataClass._DataField.FieldLen += 4;
+
+                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicDataClass._FsxParam.Checkeddata;
+                PublicDataClass._DataField.FieldLen++;
+
+                PublicDataClass._DataField.FieldVSQ++;
+
+                PublicDataClass.ParamInfoAddr = 0x5900;
+            }
+            if (NowMenuIndex == 7)
+            {
+                if (PublicDataClass._DataField.FieldVSQ > 0)
+                {
+                    if (ty == 1)
+                        PublicDataClass._ComTaskFlag.SET_RYB_1 = true;
+
+                    if (ty == 2)
+                        PublicDataClass._NetTaskFlag.SET_RYB_1 = true;
+                }
+                else
+                {
+                    MessageBox.Show("请选择读取参数项！", "信  息", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                }
+                
+            }
+            else
+            {
+                if (ty == 1)
+                    PublicDataClass._ComTaskFlag.SET_PARAM_CON = true;
+
+                if (ty == 2)
+                    PublicDataClass._NetTaskFlag.SET_PARAM_CON = true;
+                if (ty == 3)
+                    PublicDataClass._GprsTaskFlag.SET_PARAM_CON = true;
+            }
+        }
+
+        private void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+            try
+            {
+                switch (e.TabPage.Name)
+                {
+                    case "tabPage1":                //网络参数
+                        NowMenuIndex = 1;
+                        FibrePfm.TopLevel = false;
+                        tabPage1.Controls.Clear();
+                        tabPage1.Controls.Add(FibrePfm);
+                        button1.Visible = false;
+
+                        FibrePfm.StartPosition = FormStartPosition.Manual;  //修改窗体的起始位置 后才能修改top和left
+                        FibrePfm.Top = 0;
+
+                        FibrePfm.Left = 0;
+                        FibrePfm.Width = this.Width;
+                        FibrePfm.Height = this.Height;
+
+                        FibrePfm.Show();
+
+                        break;
+
+                    case "tabPage2":                //GPRS参数
+                        NowMenuIndex = 2;
+                        GprsPfm.TopLevel = false;
+                        tabPage1.Controls.Clear();
+                        tabPage2.Controls.Add(GprsPfm);
+                        button1.Visible = false;
+
+
+                        GprsPfm.StartPosition = FormStartPosition.Manual;  //修改窗体的起始位置 后才能修改top和left
+                        GprsPfm.Top = 0;
+
+                        GprsPfm.Left = 0;
+                        GprsPfm.Width = this.Width;
+                        GprsPfm.Height = this.Height;
+
+                        GprsPfm.Show();
+                        break;
+
+                    case "tabPage3":                //串口参数
+                        NowMenuIndex = 3;
+                        ComPfm.TopLevel = false;
+                        tabPage1.Controls.Clear();
+                        tabPage3.Controls.Add(ComPfm);
+                        button1.Visible = false;
+
+
+                        ComPfm.StartPosition = FormStartPosition.Manual;  //修改窗体的起始位置 后才能修改top和left
+                        ComPfm.Top = 0;
+
+                        ComPfm.Left = 0;
+                        ComPfm.Width = this.Width;
+                        ComPfm.Height = this.Height;
+
+                        ComPfm.Show();
+                        break;
+                    case "tabPage4":                //系统参数
+                        NowMenuIndex = 4;
+                        tabPage1.Controls.Clear();
+                        tabPage4.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        listView1.CheckBoxes = false;
+                        textBoxvalue.Visible = false;
+                        button1.Visible = false;
+
+                        CheckNowParamState();
+                        break;
+                    case "tabPage5":                //运行参数
+                        NowMenuIndex = 5;
+                        tabPage1.Controls.Clear();
+                        tabPage5.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        listView1.CheckBoxes = false;
+                        textBoxvalue.Visible = false;
+                        button1.Visible = false;
+
+                        CheckNowParamState();
+                        break;
+                    case "tabPage6":                //系统保护参数
+                        NowMenuIndex = 6;
+                        tabPage1.Controls.Clear();
+                        tabPage6.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        listView1.CheckBoxes = false;
+                        textBoxvalue.Visible = false;
+                        button1.Visible = false;
+
+                        CheckNowParamState();
+                        break;
+                    case "tabPage7":                //软压板参数
+                        NowMenuIndex = 7;
+                        tabPage1.Controls.Clear();
+                        tabPage7.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        listView1.CheckBoxes = true;
+                        textBoxvalue.Visible = false;
+                        button1.Visible = true;
+
+                        CheckNowParamState();
+                        break;
+                    case "tabPage8":                //反时限保护参数
+                        NowMenuIndex = 8;
+                        FsxPfm.TopLevel = false;
+                        tabPage1.Controls.Clear();
+                        tabPage8.Controls.Add(FsxPfm);
+                        button1.Visible = false;
+
+
+                        FsxPfm.StartPosition = FormStartPosition.Manual;  //修改窗体的起始位置 后才能修改top和left
+                        FsxPfm.Top = 0;
+
+                        FsxPfm.Left = 0;
+                        FsxPfm.Width = this.Width;
+                        FsxPfm.Height = this.Height;
+
+                        FsxPfm.Show();
+                        break;
+                    default:
+                        break;
+
+                }
+
+            }
+            catch
+            {
+
+
+            }
+        }
+        /********************************************************************************************
+       *  函数名：    CheckCfgState                                                                *
+       *  功能  ：    CheckNowParamState                                                           *
+       *  参数  ：    无                                                                           *
+       *  返回值：    无                                                                           *
+       *  修改日期：  2010-11-09                                                                   *
+       *  作者    ：  cuibj                                                                        *
+       * ******************************************************************************************/
+        private void CheckNowParamState()
+        {
+
+            if (NowMenuIndex == 4)        //系统参数
+            {
+
+                for (byte j = 0; j < PublicDataClass._SysParam.num; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._SysParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._SysParam.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._SysParam.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+
+            }
+            else if (NowMenuIndex == 5)        //运行参数
+            {
+
+                for (byte j = 0; j < PublicDataClass._RunParam.num; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._RunParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._RunParam.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._RunParam.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+
+            }
+            else if (NowMenuIndex == 6)        //系统保护参数
+            {
+
+                for (byte j = 0; j < PublicDataClass._FuncParam.num/3; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._FuncParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._FuncParam.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._FuncParam.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+            }
+            else if (NowMenuIndex == 7)        //功能配置参数
+            {
+
+                for (byte j = 0; j < PublicDataClass._FuncConfigParam.num ; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._FuncConfigParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._FuncConfigParam.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._FuncConfigParam.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+            }
+   
+        }
+        /// <summary>
+        /// 窗体的大小改变事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param funtion="根据当前的页面动态地调整相应窗体的大小"></param>
+        /// <param anthor="cuibj"></param>
+        /// <param Time="11-04-28"></param>
+        private void SysPDocmentView_SizeChanged(object sender, EventArgs e)
+        {
+            if (NowMenuIndex == 1)
+            {
+                FibrePfm.Width = this.Width;
+                FibrePfm.Height = this.Height;
+            }
+            else if (NowMenuIndex == 2)
+            {
+                GprsPfm.Width = this.Width;
+                GprsPfm.Height = this.Height;
+
+            }
+            else if (NowMenuIndex == 3)
+            {
+                ComPfm.Width = this.Width;
+                ComPfm.Height = this.Height;
+            }
+        }
+
+        private void RefreshParamState()
+        {
+            if (NowMenuIndex == 4)
+            {
+                PublicDataClass._SysParam.num = listView1.Items.Count;
+                PublicDataClass._SysParam.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._SysParam.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._SysParam.ByteTable = new string[listView1.Items.Count];
+
+                for (byte j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._SysParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._SysParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._SysParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+            else if (NowMenuIndex == 5)
+            {
+                PublicDataClass._RunParam.num = listView1.Items.Count;
+                PublicDataClass._RunParam.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._RunParam.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._RunParam.ByteTable = new string[listView1.Items.Count];
+
+                for (byte j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._RunParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._RunParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._RunParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+            else if (NowMenuIndex == 6)
+            {
+                PublicDataClass._FuncParam.num = listView1.Items.Count*3;
+                PublicDataClass._FuncParam.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._FuncParam.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._FuncParam.ByteTable = new string[listView1.Items.Count];
+
+                for (byte j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._FuncParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._FuncParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._FuncParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+
+                    
+                }
+            }
+            else if (NowMenuIndex == 7)
+            {
+                PublicDataClass._FuncConfigParam.num = listView1.Items.Count ;
+                PublicDataClass._FuncConfigParam.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._FuncConfigParam.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._FuncConfigParam.ByteTable = new string[listView1.Items.Count];
+
+                for (byte j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._FuncConfigParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._FuncConfigParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._FuncConfigParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+
+
+                }
+            }
+        }
+
+        private void AddMenuItem_Click(object sender, EventArgs e)
+        {
+            AddParamRecordViewForm AddPfm = new AddParamRecordViewForm();
+            AddPfm.ShowDialog();
+            if (AddPfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+            {
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listView1.Items.Count));
+                lv.SubItems.Add(PublicDataClass._AddParamRecord.Name);
+
+                lv.SubItems.Add(PublicDataClass._AddParamRecord.Value);
+                lv.SubItems.Add(PublicDataClass._AddParamRecord.Beilv);
+                listView1.Items.Add(lv);
+                RefreshParamState();
+            }
+        }
+
+        private void DeleteMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("确定要删除此项吗?", "信  息",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+            {
+                ListView.SelectedListViewItemCollection SettleOnItem = new ListView.SelectedListViewItemCollection(this.listView1);
+
+                if (SettleOnItem.Count <= 0)
+                {
+                    MessageBox.Show("记录项选择为空", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                for (byte i = 0; i < SettleOnItem.Count; )
+                {
+
+                    listView1.Items.Remove(SettleOnItem[i]);       //删除所选择的项
+                }
+                for (byte i = 0; i < listView1.Items.Count; i++)
+                {
+                    listView1.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+
+                }
+                RefreshParamState();
+            }
+        }
+
+        private void SysPDocmentView_Activated(object sender, EventArgs e)
+        {
+            PublicDataClass._WindowsVisable.XtParamUpdateVisable = true;            //窗体可见
+            timer1.Enabled = true;
+
+            if (num == PublicDataClass.SaveText.devicenum)
+                return;
+            comboBox1.Items.Clear();
+            num = PublicDataClass.SaveText.devicenum;
+            if (PublicDataClass.SaveText.devicenum == 0)
+            {
+                comboBox1.Text = "无信息";
+
+            }
+            else
+            {
+                for (byte i = 0; i < PublicDataClass.SaveText.devicenum; i++)
+                {
+                    comboBox1.Items.Add(PublicDataClass.SaveText.Device[i].PointName);
+                }
+                comboBox1.Text = PublicDataClass.SaveText.Device[0].PointName;
+
+            }
+        }
+
+        private void listView1_SubItemClicked(object sender, SubItemEventArgs e)
+        {
+            if ((e.SubItem < 2) || e.SubItem ==3) // Password field
+            {
+                // the current value (text) of the subitem is ****, so we have to provide
+                // the control with the actual text (that's been saved in the item's Tag property)
+                return;
+            }
+            listView1.StartEditing(Editors[e.SubItem], e.Item, e.SubItem);
+        }
+
+        private void textBoxvalue_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar != '\b')//这是允许输入退格键
+            {
+                if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                {
+
+                    MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //listView1.RemoveEmbeddedControl(tbox);
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void textBoxvalue_Leave(object sender, EventArgs e)
+        {
+            listView1.EndEditing(true);
+            RefreshParamState();
+        }
+
+        private void listView1_MouseClick(object sender, MouseEventArgs e)
+        {
+            //foreach (ListViewItem item in this.listView1.Items)
+            //{
+            //    item.ForeColor = SystemColors.WindowText;
+
+            //}
+            //this.listView1.SelectedItems[0].ForeColor = Color.Red;//设置当前选择项为红色
+        }
+        ///
+        
+        /// <summary>
+        /// 保存--按钮的事件处理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonsave_Click(object sender, EventArgs e)
+        {
+            string FileName = "";
+            //string path  =Application.ExecutablePath;
+            string path = System.AppDomain.CurrentDomain.BaseDirectory;
+
+            //string path = System.IO.Directory.GetCurrentDirectory();
+            //string path = System.Environment.CurrentDirectory;
+            path += "ini";
+            
+            if (NowMenuIndex == 1)  //保存网络参数
+            {
+
+                FileName = path + "\\netparam.ini";
+                WriteReadAllFile.WriteReadSysIniFile(FileName, 1, 0);
+            }
+            else if (NowMenuIndex == 3)   //串口参数
+            {
+                FileName = path + "\\comparam.ini";
+                WriteReadAllFile.WriteReadSysIniFile(FileName, 1, 1);
+
+            }
+            else if (NowMenuIndex == 4)   //系统参数
+            {
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._SysParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;
+                    PublicDataClass._SysParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+                    PublicDataClass._SysParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+
+                }
+
+                FileName = path + "\\sysparam.ini";
+                PublicDataClass._SysParam.num = listView1.Items.Count * 3;
+
+                WriteReadAllFile.WriteReadSysIniFile(FileName, 1, 2);
+
+
+            }
+            else if (NowMenuIndex == 6)   //系统保护参数
+            {
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._FuncParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;
+                    PublicDataClass._FuncParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+                    PublicDataClass._FuncParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+
+                }
+
+                FileName = path + "\\protectparam.ini";
+            //    PublicDataClass._FuncParam.num = listView1.Items.Count * 3;
+
+                WriteReadAllFile.WriteReadSysIniFile(FileName, 1, 9);
+
+
+            }
+            else if (NowMenuIndex == 7)   //功能配置参数
+            {
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._FuncConfigParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;
+                    PublicDataClass._FuncConfigParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+                    PublicDataClass._FuncConfigParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+
+                }
+
+                FileName = path + "\\funcconfigparam .ini";
+                PublicDataClass._FuncConfigParam.num = listView1.Items.Count ;
+
+                WriteReadAllFile.WriteReadSysIniFile(FileName, 1, 10);
+
+
+            }
+            MessageBox.Show("保存成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        /// <summary>
+        /// 插入--菜单的消息响应函数
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void InsertMenuItem_Click(object sender, EventArgs e)
+        {
+            AddParamRecordViewForm AddPfm = new AddParamRecordViewForm();
+            AddPfm.ShowDialog();
+            if (AddPfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+            {
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listView1.SelectedItems[0].Index));
+                lv.SubItems.Add(PublicDataClass._AddParamRecord.Name);
+
+                lv.SubItems.Add(PublicDataClass._AddParamRecord.Value);
+                lv.SubItems.Add(PublicDataClass._AddParamRecord.Beilv);
+                listView1.Items.Insert(this.listView1.SelectedItems[0].Index,lv);
+                for (int i = 0; i < listView1.Items.Count; i++)
+                {
+                    listView1.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+
+                }
+                RefreshParamState();
+                //listView1.Items.Add(lv);
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (NowMenuIndex == 7)   //软压板配置参数
+            {
+                int i = 0; int j = 0; int addr;
+                foreach (ListViewItem tempItem in listView1.Items)//循环遍历listView控件中的每一项
+                {
+                    if (tempItem.Checked == true)
+                    {
+                        addr = 0x8001 + i;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(addr & 0x00ff);
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = Convert.ToByte((addr & 0xff00) >> 8);
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 2] = 0;
+                        //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 3] = Convert.ToByte(PublicDataClass._FuncConfigParam.ValueTable[i]);
+                        //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 4] = 0;
+                        //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 5] = 0;
+                        //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 6] = 0;
+                        PublicDataClass._DataField.FieldLen += 3;
+                        PublicDataClass._DataField.FieldVSQ++;
+                    }
+                    i++;
+                }
+                if (PublicDataClass._DataField.FieldVSQ > 0)
+                {
+                    if (ty == 1)
+                        PublicDataClass._ComTaskFlag.READ_RYB_1 = true;
+
+                    if (ty == 2)
+                        PublicDataClass._NetTaskFlag.READ_RYB_1 = true;
+                }
+                else
+                {
+                    MessageBox.Show("请选择读取参数项！", "信  息", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (PublicDataClass._WindowsVisable.XtParamUpdateVisable== true)  //窗体可见
+            {
+
+                if (PublicDataClass._Message.NetReadRYB== true)
+                {
+                    PublicDataClass._Message.NetReadRYB= false;
+                    int dex = 0;
+                    ListViewItem lv;
+
+                    if (NowMenuIndex == 7)   //软压板配置参数
+                    {
+                        for (int i = 0; i < PublicDataClass._DataField.FieldVSQ; i++)
+                        {
+                            int StartAddr = 0;
+                            StartAddr = PublicDataClass._DataField.Buffer[dex + 2];
+                            StartAddr = StartAddr << 16;
+                            StartAddr += PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8);
+
+                            lv = new ListViewItem(String.Format("{0:d}", StartAddr - 0x8001));
+                            //lv.SubItems.Add("<遥信变位>");
+                            lv.SubItems.Add(Convert.ToString(PublicDataClass._FuncConfigParam.NameTable[StartAddr - 0x8001]));   //加入名称
+
+                            lv.SubItems.Add(String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 3]));  //状态
+
+                            lv.SubItems.Add("4");
+                           
+                            listView1.Items.Add(lv);
+                            dex += 7;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SysPDocmentView_Deactivate(object sender, EventArgs e)
+        {
+            PublicDataClass._WindowsVisable.CallDataUpdatVisable = false;            //窗体可见
+            timer1.Enabled = false;
+        }
+
+      
+    }
+}

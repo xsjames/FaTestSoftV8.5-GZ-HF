@@ -1,0 +1,61 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using KD.WinFormsUI.Docking;
+
+namespace FaTestSoft
+{
+    public partial class GraphicDocmentViewForm : DockContent
+    {
+        public GraphicDocmentViewForm()
+        {
+            InitializeComponent();
+        }
+
+        ToolBarManager _toolBarManager;
+
+        //进行操作的位图
+        private Image MyImg;
+        //绘制位图实例对象
+        private Graphics graphics;
+        //绘图使用颜色
+        private Color foreColor = Color.Black;
+        private Color backColor = Color.White;
+
+        private void GraphicDocmentViewForm_Load(object sender, EventArgs e)
+        {
+            Rectangle rect = pictureBox1.ClientRectangle;
+
+            _toolBarManager = new ToolBarManager(this, this);
+            _toolBarManager.AddControl(toolBar1, DockStyle.Top);
+        }
+
+        /*private void toolBar1_ButtonClick_1(object sender, ToolBarButtonClickEventArgs e)
+        {
+             bool add = e.Button.Pushed;
+             switch (e.Button.Tag.ToString().ToLower())
+             {
+
+                 case "new":
+                     GraphicToolForm toolfm = new GraphicToolForm();
+                     toolfm.ShowDialog() ;
+                     break;
+             }
+            //Graphics g = this.panel2.CreateGraphics();
+            //g.Clear(backColor);
+            //MyImg = new Bitmap(this.panel2.ClientRectangle.Width, this.panel2.ClientRectangle.Height);
+            //graphics = Graphics.FromImage(MyImg);
+            //graphics.Clear(backColor);
+        }
+       
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }*/
+    }
+}

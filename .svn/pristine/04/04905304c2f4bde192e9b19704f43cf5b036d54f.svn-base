@@ -1,0 +1,264 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.IO.Ports;
+using System.Net.Sockets;
+using System.Net;
+using System.IO;
+using System.Threading;
+using FaTestSoft.CommonData;  
+
+namespace FaTestSoft
+{
+    public partial class monitor : Form
+    {
+
+        public monitor()
+        {
+            InitializeComponent();
+        }
+
+        private static Socket conn1 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private static Thread ComThread,ConnectThread1, NetSendThread1, NetRecvThread1;
+        static string Msg = @"";
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked == true)
+            {
+                checkBox2.Checked = false;
+                //if (PublicDataClass._MnitorParam.TcpLinkType == 2)
+                //{
+                //    if (NetSendThread1 != null)
+                //        NetSendThread1.Abort();
+                //    if (NetRecvThread1 != null)
+                //        NetRecvThread1.Abort();
+                //    if (ConnectThread1 != null)
+                //        ConnectThread1.Abort();
+                //    //if (ComThread != null)
+                //    //    ComThread.Abort();
+                //    conn1.Close();
+                //    //PublicDataClass._MnitorParam.TcpLinkType = 0;
+                //    //PublicDataClass._MnitorParam.TcpLinkState = true;
+                //}
+                if (comboBox1.Text == "NET")
+                {
+                    
+                    if (textBox1.Text == "")
+                        MessageBox.Show("请输入监视端口号！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else
+                        PublicDataClass._MnitorParam.MnitorPort = textBox1.Text;
+                      
+
+                    if (textBox2.Text == "")
+                        MessageBox.Show("请输入监视IP！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else
+                        PublicDataClass._MnitorParam.MnitorIP= textBox2.Text;
+
+                    PublicDataClass._NetStructData.NetTBuffer[0] = 0x11;  //发送数组内容待定
+                    PublicDataClass._NetStructData.NetTBuffer[1] = 0x11;
+                    PublicDataClass._NetStructData.NetTBuffer[2] = 0x11;
+                    PublicDataClass._NetStructData.NetTBuffer[3] = 0x11;
+                    PublicDataClass._NetStructData.NetTBuffer[4] = 0x11;
+                    PublicDataClass._NetStructData.NetTLen = 5;
+                    PublicDataClass.SedNetFrameMsg = "启动监视";
+                    PublicDataClass._NetStructData.TX_TASK = true;
+
+                    conn1 = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    ConnectThread1 = new Thread(new ThreadStart(ConnThreadProc1));
+                    ConnectThread1.Start();
+
+                    //NetSendThread1 = new Thread(new ThreadStart(NetThreadSendProc1));
+                    //NetSendThread1.Start();
+
+                    NetRecvThread1 = new Thread(new ThreadStart(ReceiveNetMsg1));
+                    NetRecvThread1.Start();
+                }
+                else if(comboBox1.Text == "COM")
+                {
+                    if (textBox1.Text == "")
+                        MessageBox.Show("请输入监视端口号！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else
+                        PublicDataClass._MnitorParam.MnitorComPort = textBox1.Text;
+
+                    if (comboBox2.Text == "")
+                        MessageBox.Show("请输入监视端口波特率！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else
+                        PublicDataClass._MnitorParam.MnitorCombaud = comboBox2.Text;
+
+                    if (comboBox3.Text == "")
+                        MessageBox.Show("请输入监视端口校验类型！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else
+                        PublicDataClass._MnitorParam.MnitorComjy = comboBox3.Text;
+
+
+
+
+                    PublicDataClass._ComStructData.TXBuffer[0] = 0x11;  //发送数组内容待定
+                    PublicDataClass._ComStructData.TXBuffer[1] = 0x11;
+                    PublicDataClass._ComStructData.TXBuffer[2] = 0x11;
+                    PublicDataClass._ComStructData.TXBuffer[3] = 0x11;
+                    PublicDataClass._ComStructData.TXBuffer[4] = 0x11;
+                    PublicDataClass._ComStructData.TxLen = 5;
+                    PublicDataClass.ComFrameMsg = "启动监视";
+                    PublicDataClass._ComStructData.TX_TASK = true;
+                }
+                
+            }
+            else
+            {
+                checkBox2.Checked = true;
+                
+            }
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked == true)
+            {
+                checkBox1.Checked = false;
+                //if (PublicDataClass._MnitorParam.TcpLinkType == 2)
+                //{
+                    if (NetSendThread1 != null)
+                        NetSendThread1.Abort();
+                    if (NetRecvThread1 != null)
+                        NetRecvThread1.Abort();
+                    if (ConnectThread1 != null)
+                        ConnectThread1.Abort();
+                    //if (ComThread != null)
+                    //    ComThread.Abort();
+                    conn1.Close();
+                    PublicDataClass._MnitorParam.TcpLinkType = 0;
+                    PublicDataClass._MnitorParam.TcpLinkState = true;
+                //}
+               
+            }
+            else
+            {
+                checkBox1.Checked = true;
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox1.SelectedIndex == 0)
+            {
+                textBox1.Enabled = true;
+                textBox2.Enabled = true;
+                comboBox2.Enabled = false;
+                comboBox3.Enabled = false;
+            }
+            else if(comboBox1.SelectedIndex == 1)
+            {
+                textBox1.Enabled = true;
+                textBox2.Enabled = false;
+                comboBox2.Enabled = true;
+                comboBox3.Enabled = true;
+            }
+        }
+
+        private void ConnThreadProc1()          //连接socket线程
+        {
+
+            while (true)
+            {
+                try
+                {
+
+                    conn1.Connect(IPAddress.Parse(PublicDataClass._MnitorParam.MnitorIP), Convert.ToInt16(PublicDataClass._MnitorParam.MnitorPort));
+                    PublicDataClass._MnitorParam.TcpLinkType = 2;
+                    PublicDataClass._MnitorParam.TcpLinkState = true;
+                    break;
+
+                }
+                catch
+                {
+
+                    PublicDataClass._MnitorParam.TcpLinkType = 1;
+                    PublicDataClass._MnitorParam.TcpLinkState = true;
+
+                }
+                Thread.Sleep(20000);   //20s
+            }
+
+        }
+/*========================================================================================报文监视时是不是不需要报文发送？
+        public static void NetThreadSendProc1()   //网络发送数据线程
+        {
+            //NetworkStream streamToClent = tclient.GetStream();
+            while (true)    //处理事物
+            {
+                //PtlNetFrameProc(); // 是否有发送任务处理
+                if (PublicDataClass._NetStructData.TX_TASK)
+                {
+                    PublicDataClass._NetStructData.TX_TASK = false;
+
+                    try
+                    {
+                        conn1.Send(PublicDataClass._NetStructData.NetTBuffer, 0, PublicDataClass._NetStructData.NetTLen, 0);
+                        PublicDataClass._Message.NetShowSendTextData = true;
+                    }
+                    catch
+                    {
+                        //NetLinkIsClose = true;
+                        // MessageBox.Show("网络已断开连接");
+
+                    }
+
+                    PublicDataClass._Message.NetShowSendOver = true;
+                }
+                Thread.Sleep(1);
+
+
+            }
+
+
+        }
+*/  //=============================================================================================
+        
+        private void ReceiveNetMsg1()   //---------------------------------------------网络解包线程
+        {
+            while (true)
+            {
+                try
+                {
+                   
+                    PublicDataClass._MnitorParam.NetRLen = conn1.Receive(PublicDataClass._MnitorParam.NetRBuffer);
+                    if (PublicDataClass._NetStructData.NetRLen > 0)
+                    {
+                        PublicDataClass._MnitorParam.NetShowRecvMonitorData = true;
+                       
+                    }
+                  
+
+                }
+                catch
+                {
+
+
+                }
+                Thread.Sleep(1);
+
+            }
+
+        }
+
+        private void monitor_Load(object sender, EventArgs e)
+        {
+            comboBox1.SelectedIndex = 0;
+            comboBox1.SelectedIndex = 0;
+            comboBox1.SelectedIndex = 0;
+        }
+
+  
+
+      
+
+       
+    }
+}

@@ -1,0 +1,931 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using KD.WinFormsUI.Docking;
+using FaTestSoft.CommonData;
+using FaTestSoft.FUNCTIONCLASS;
+using System.Text.RegularExpressions;
+
+
+
+namespace FaTestSoft
+{
+    public partial class HistoryDataDocmemtView : DockContent
+    {
+        public HistoryDataDocmemtView()
+        {
+            InitializeComponent();
+        }
+        private byte[] _HisDataField = new byte[11];
+
+        static int FrameSeq = 0;
+        public int num      = 0;
+        private int ty;
+        bool saveret        = false;
+        string savename;
+        int YCdatapos = 0;//数据个数标志
+
+        private void HistoryDataDocmemtView_Load(object sender, EventArgs e)
+        {
+            dateTimePickerendtime.Enabled = false;
+            textBoxfrom.Text="1";
+            textBoxto.Text = "10";
+            comboBoxData.SelectedIndex = 0;
+            if (PublicDataClass.SaveText.devicenum == 0)
+            {
+                comboBoxPoint.Text = "无信息";
+
+            }
+            else
+            {
+                for (byte i = 0; i < PublicDataClass.SaveText.devicenum; i++)
+                {
+                    comboBoxPoint.Items.Add(PublicDataClass.SaveText.Device[i].PointName);
+                }
+                comboBoxPoint.Text = PublicDataClass.SaveText.Device[0].PointName;
+
+            }
+            num = PublicDataClass.SaveText.devicenum;
+            for (int i = 1; i < 60; i++)
+                dUpDown.Items.Add(i);
+            dUpDown.SelectedIndex = 0;
+        }
+        /// <summary>
+        /// 召测 ---按钮的消息响应
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttoncall_Click(object sender, EventArgs e)
+        {
+            if (PublicDataClass.LinSPointName == "无信息")
+            {
+                MessageBox.Show("无测量点信息可操作", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else
+            {
+                ty = PublicFunction.CheckPointOfCommunicationEntrace(comboBoxPoint.Text);
+                if (ty == 0)
+                {
+                    MessageBox.Show("无测量点信息可操作", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+
+                }
+
+            }
+
+
+            if (Regex.IsMatch(textBoxfrom.Text, @"^\d+$", RegexOptions.Singleline) == false)
+            {
+                MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (Regex.IsMatch(textBoxto.Text, @"^\d+$", RegexOptions.Singleline) == false)
+            {
+                MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if ((Convert.ToInt16(textBoxfrom.Text) < 1) || (Convert.ToInt16(textBoxfrom.Text) > 255))//这是允许输入0-9数字
+            {
+
+                MessageBox.Show("范围错误！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if ((Convert.ToInt16(textBoxto.Text) <1) || (Convert.ToInt16(textBoxto.Text) > 255))//这是允许输入0-9数字
+            {
+
+                MessageBox.Show("范围错误！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (Convert.ToInt16(textBoxfrom.Text) > Convert.ToInt16(textBoxto.Text))
+            {
+                MessageBox.Show("范围错误！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+
+
+
+            int BeginDay = Convert.ToByte(dateTimePickerbegindata.Value.Month) * 31 + Convert.ToByte(dateTimePickerbegindata.Value.Day);
+            int EndDay = Convert.ToByte(dateTimePickerenddata.Value.Month) * 31 + Convert.ToByte(dateTimePickerenddata.Value.Day);
+            int BeginMin = Convert.ToByte(dateTimePickerbegintime.Value.Hour) * 60 + Convert.ToByte(dateTimePickerbegintime.Value.Minute);
+            int EndMin = Convert.ToByte(dateTimePickerendtime.Value.Hour) * 60 + Convert.ToByte(dateTimePickerendtime.Value.Minute);
+
+            if (dateTimePickerendtime.Enabled == false)
+            {
+                PublicDataClass._DataField.FieldLen = 0;
+                PublicDataClass._DataField.FieldVSQ = 0;
+                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = (byte)Convert.ToInt16(textBoxfrom.Text);
+                PublicDataClass._DataField.FieldLen++;
+                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = (byte)Convert.ToInt16(textBoxto.Text);
+                PublicDataClass._DataField.FieldLen++;
+                for (byte i = 0; i < 1; i++)
+                    _HisDataField[i] = PublicDataClass._DataField.Buffer[i];
+                FrameSeq = 0;
+                PublicDataClass._DataField.FieldVSQ = 2;
+
+            }
+            else
+            {
+
+
+                if (EndDay < BeginDay)
+                {
+                    MessageBox.Show("结束月份<开始月份", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                else if (EndDay == BeginDay)   //同月
+                {
+
+                    if (EndMin < BeginMin)
+                    {
+
+                        MessageBox.Show("结束时分<开始时分", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    else
+                    {
+                        PublicDataClass._DataField.FieldLen = 1;
+                        PublicDataClass._DataField.FieldVSQ = 0;
+
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegindata.Value.Year - 2000));
+                        PublicDataClass._DataField.FieldLen++;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegindata.Value.Month));
+                        PublicDataClass._DataField.FieldLen++;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegindata.Value.Day));
+                        PublicDataClass._DataField.FieldLen++;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegintime.Value.Hour));
+                        PublicDataClass._DataField.FieldLen++;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegintime.Value.Minute));
+                        PublicDataClass._DataField.FieldLen++;
+
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerenddata.Value.Year - 2000));
+                        PublicDataClass._DataField.FieldLen++;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerenddata.Value.Month));
+                        PublicDataClass._DataField.FieldLen++;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerenddata.Value.Day));
+                        PublicDataClass._DataField.FieldLen++;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerendtime.Value.Hour));
+                        PublicDataClass._DataField.FieldLen++;
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerendtime.Value.Minute));
+                        PublicDataClass._DataField.FieldLen++;
+                        for (byte i = 0; i < 11; i++)
+                            _HisDataField[i] = PublicDataClass._DataField.Buffer[i];
+                        
+                        PublicDataClass._DataField.FieldVSQ = 11;
+                        
+                    }
+                }
+                else if (EndDay > BeginDay) //跨月
+                {
+                    PublicDataClass._DataField.FieldLen = 1;
+                    PublicDataClass._DataField.FieldVSQ = 0;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegindata.Value.Year - 2000));
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegindata.Value.Month));
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegindata.Value.Day));
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegintime.Value.Hour));
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerbegintime.Value.Minute));
+                    PublicDataClass._DataField.FieldLen++;
+
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerenddata.Value.Year - 2000));
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerenddata.Value.Month));
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerenddata.Value.Day));
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerendtime.Value.Hour));
+                    PublicDataClass._DataField.FieldLen++;
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicFunction.HextoBCD(Convert.ToByte(dateTimePickerendtime.Value.Minute));
+                    PublicDataClass._DataField.FieldLen++;
+                    for (byte i = 0; i < 11; i++)
+                        _HisDataField[i] = PublicDataClass._DataField.Buffer[i];
+                    PublicDataClass._DataField.FieldVSQ = 11;
+                    FrameSeq = 0;
+                    PublicDataClass.ParamInfoAddr = Convert.ToInt16(dUpDown.Text) + (FrameSeq << 8);
+                    datapos = 0;
+                    pos = 0;
+                }
+            }//dateTimePickerendtime.Enabled == true
+            if (comboBoxData.SelectedIndex == 0)    //H0_遥信变位记录
+            {
+                if (ty == 1)
+                    PublicDataClass._ComTaskFlag.CallRecordData = true;
+
+                if (ty == 2)
+                    PublicDataClass._NetTaskFlag.CallRecordData = true;
+
+                if (ty == 3)
+                    PublicDataClass._GprsTaskFlag.CallRecordData = true;
+
+                datapos = 0;
+                PublicDataClass.ParamInfoAddr = 0x7000;
+            }
+            else if (comboBoxData.SelectedIndex == 1)  //故障电流信息
+            {
+                if (ty == 1)
+                    PublicDataClass._ComTaskFlag.CallRecordData = true;
+
+                if (ty == 2)
+                    PublicDataClass._NetTaskFlag.CallRecordData = true;
+
+                if (ty == 3)
+                    PublicDataClass._GprsTaskFlag.CallRecordData = true;
+                datapos = 0;
+                pos = 0;
+                PublicDataClass.ParamInfoAddr = 0x7000;
+            }
+            else if (comboBoxData.SelectedIndex == 2) //遥控操作
+            {
+
+                if (ty == 1)
+                    PublicDataClass._ComTaskFlag.CallRecordData = true;
+
+                if (ty == 2)
+                    PublicDataClass._NetTaskFlag.CallRecordData = true;
+
+                if (ty == 3)
+                    PublicDataClass._GprsTaskFlag.CallRecordData = true;
+                datapos = 0;
+                pos = 0;
+       
+                PublicDataClass.ParamInfoAddr = 0x7001;
+            }
+            else if (comboBoxData.SelectedIndex == 3)//历史记录
+            {
+                if (ty == 1)
+                    PublicDataClass._ComTaskFlag.CallHisData = true;
+
+                if (ty == 2)
+                    PublicDataClass._NetTaskFlag.CallHisData = true;
+                datapos = 0;
+                pos = 0;
+                PublicDataClass._DataField.Buffer[0] = 0;
+                PublicDataClass.ParamInfoAddr = 0x7002;
+
+            }
+            else if (comboBoxData.SelectedIndex == 4)//统计数据-最大最小值
+            {
+                if (ty == 1)
+                    PublicDataClass._ComTaskFlag.CallHisData = true;
+
+                if (ty == 2)
+                    PublicDataClass._NetTaskFlag.CallHisData = true;
+                datapos = 0;
+                pos = 0;
+                PublicDataClass._DataField.Buffer[0] = 0;
+                PublicDataClass.ParamInfoAddr = 0x7003;
+
+
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (PublicDataClass._WindowsVisable.HistoryDataUpdateVisable == true)  //窗体可见
+            {
+
+                if (PublicDataClass._Message.CallHisDataDocmentView == true)
+                {
+                    PublicDataClass._Message.CallHisDataDocmentView = false;
+                    ProcessHisData();
+                }
+            }
+            if (saveret)
+            {
+                saveret = false;
+                ExportToExcel(savename);
+                buttonoutput.Text = "导出";
+                MessageBox.Show("数据导出成功", "信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void HistoryDataDocmemtView_Deactivate(object sender, EventArgs e)
+        {
+            PublicDataClass._WindowsVisable.HistoryDataUpdateVisable = false;        //窗体不可见
+            timer1.Enabled = false;
+        }
+
+        private void HistoryDataDocmemtView_Activated(object sender, EventArgs e)
+        {
+            PublicDataClass._WindowsVisable.HistoryDataUpdateVisable = true;        //窗体可见
+            timer1.Enabled = true;
+        }
+
+        private void ProcessHisData()
+        {
+            if (comboBoxData.SelectedIndex == 0)
+            {
+                ShowHisRecordData(1);
+            }
+            else if (comboBoxData.SelectedIndex == 1)
+            { 
+                ShowHisRecordData(2); 
+            }
+            else if (comboBoxData.SelectedIndex == 2)
+            {
+                ShowHisRecordData(3);
+            }
+           else if (comboBoxData.SelectedIndex == 3)
+               ShowYcHisData();
+           else if (comboBoxData.SelectedIndex == 4)
+                ShowTjHisData();
+        }
+        static int datapos = 0;
+        static int pos = 0;
+        private void ShowYcHisData()
+        {
+            //int dex = 8; string strdata = @"";
+            //if (PublicDataClass._DataField.FieldLen < 5)
+            //{
+            //    ListViewItem lv = new ListViewItem(String.Format("{0:d}", 0));
+            //    lv.SubItems.Add("无数据记录");
+            //    lv.SubItems.Add("无");
+            //    lv.SubItems.Add("无");
+            //    lv.SubItems.Add("无");
+            //    listView1.Items.Add(lv);
+            //    return;
+            //}
+            //if (datapos == 0)
+            //{
+            //    ListViewItem lv = new ListViewItem(String.Format("{0:d}", datapos));
+            //    if (PublicDataClass._DataField.Buffer[2] == 1)
+            //       lv.SubItems.Add("历史时间-遥测量");
+            //    else
+            //       lv.SubItems.Add("历史时间-统计量");
+            //    strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[3]);
+            //    strdata += "年";
+            //    strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[4]);
+            //    strdata += "月";
+            //    strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[5]);  //日+星期
+            //    strdata += "日";
+            //    strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[6]);
+            //    strdata += "时";
+            //    strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[7]);
+            //    strdata += "分";
+            //    lv.SubItems.Add(strdata);
+            //    lv.SubItems.Add("无");
+            //    lv.SubItems.Add("无");
+            //    listView1.Items.Add(lv);
+            //    datapos++;
+            //}
+
+            //for (int j = 0; j <(PublicDataClass._DataField.FieldLen-3-5)/2; j++)
+            //{
+               
+            //    ListViewItem lv = new ListViewItem(String.Format("{0:d}", datapos));
+            //        if(PublicDataClass._DataField.Buffer[2] ==1)
+            //           lv.SubItems.Add(PublicDataClass._HisData.YcNameTable[pos]);
+            //        else
+            //           lv.SubItems.Add(PublicDataClass._HisData.TjNameTable[pos]);
+            //        int data = PublicDataClass._DataField.Buffer[dex ] + (PublicDataClass._DataField.Buffer[dex +1] << 8);
+            //        dex += 2;
+            //        lv.SubItems.Add(Convert.ToString(data));
+            //        lv.SubItems.Add("无");
+            //        lv.SubItems.Add("无");
+            //        listView1.Items.Add(lv);
+            //        pos++;
+            //        datapos++;
+            //        if (PublicDataClass._DataField.Buffer[2] == 1 && pos == PublicDataClass._HisData.ycnum)
+            //        {
+            //            pos = 0;
+            //            datapos = 0; 
+
+                    //}
+                    //else if (PublicDataClass._DataField.Buffer[2] == 2 &&pos == PublicDataClass._HisData.tjnum)
+                    //{   pos = 0; 
+                    //    datapos = 0; 
+                    //}
+                    //if (PublicDataClass._DataField.Buffer[1] == 0x01)
+                    //{
+                    //    PublicDataClass._DataField.FieldVSQ = 10;
+                    //    FrameSeq++;
+                    //    pos = 0; datapos = 0;
+                    //    PublicDataClass.ParamInfoAddr = Convert.ToInt16(dUpDown.Text) + (FrameSeq << 8);
+                    //    for (byte i = 0; i < 11; i++)
+                    //        PublicDataClass._DataField.Buffer[i] = _HisDataField[i];
+                    //    PublicDataClass._DataField.FieldVSQ = 11;
+                    //    PublicDataClass._DataField.FieldLen = 11;
+                    //    PublicDataClass._NetTaskFlag.CallHisData = true;
+                    //}
+
+                         // byte[] bytes = new byte[4];
+                         // float fdata = 0.0F;   
+                         // string  str = @"";
+                         // string str2 = @"";
+                         // int datatype = 0;//数据显示类型
+
+            
+                         //     str = @"";
+                         //     str += String.Format("{0:d}", PublicDataClass._DataField.Buffer[9]);
+                         //     str += "年";
+                         //     str += String.Format("{0:d}", PublicDataClass._DataField.Buffer[10]);
+                         //     str += "月";
+                         //     str += String.Format("{0:d}", PublicDataClass._DataField.Buffer[11] & 0x1f);
+                         //     str += "日";
+                         //     str += String.Format("{0:d}", PublicDataClass._DataField.Buffer[12]);
+                         //     str += "时";
+                         //     str += String.Format("{0:d}", PublicDataClass._DataField.Buffer[13]);
+                         //     str += "分";
+                         //     ListViewItem lv0 = new ListViewItem(str);
+                         //     str = @"";
+                         
+                         //    lv0.SubItems.Add("第" + String.Format("{0:d}", (PublicDataClass._DataField.Buffer[5] + (PublicDataClass._DataField.Buffer[6] << 8))+1) + "个记录");
+                         //     listView1.Items.Add(lv0);
+                         //     datapos++;
+             
+                         //datatype = PublicDataClass._DataField.Buffer[4];//数据显示类型
+                         
+                     
+                         // int startp = 0;//其实点号位置
+                         // int StartPos = 0;
+                        
+                         // int k = 0;
+                         // string StartName = @"";
+                         // byte dx = PublicFunction.FindPointNameCorrelativeIndex(comboBoxPoint.Text);
+                       
+                         //if (PublicDataClass.ChanelId == 2)
+                         // {
+                         //     StartPos = PublicDataClass._DataField.Buffer[2+14];
+                         //     StartPos = StartPos << 16;
+                         //     StartPos += PublicDataClass._DataField.Buffer[0 + 14] + (PublicDataClass._DataField.Buffer[1 + 14] << 8);
+                         //     StartName = PublicFunction.FindStartPosCorrelativeName(1, StartPos, dx);       //找起始点号
+                         //     startp = PublicFunction.FindStartPos(1, StartPos, dx);//找起始点号位置
+                           
+                         //     for (int jj = 0; jj < PublicDataClass._DataField.FieldVSQ; jj++)
+                         //     {
+                         //         ListViewItem lv1 = new ListViewItem(String.Format("{0:d}", YCdatapos));
+    
+                         //      //   if (PublicDataClass.SaveText.Cfg[dx].YccfgState[startp] == "是")
+                         //         {
+                         //             lv1.SubItems.Add(PublicDataClass.SaveText.Cfg[dx].YccfgName[Convert.ToInt16(PublicDataClass._YcInformationParam.IndexTable[YCdatapos])]);             //名称                
+                                
+                         //             if (datatype == 1)//浮点型显示
+                         //             {
+                                  
+                         //                 bytes[0] = PublicDataClass._DataField.Buffer[k + 3 + 14];
+                         //                 bytes[1] = PublicDataClass._DataField.Buffer[k + 4+ 14];
+                         //                 bytes[2] = PublicDataClass._DataField.Buffer[k + 5 + 14];
+                         //                 bytes[3] = PublicDataClass._DataField.Buffer[k + 6 + 14];
+
+                         //                 fdata = BitConverter.ToSingle(bytes, 0);
+                         //                 k += 5;
+                                  
+                         //                 lv1.SubItems.Add(String.Format("{0:f4}", fdata));//数值
+                         //             }
+                                  
+                         //             if (datatype == 0)//整型显示 
+                         //             {
+                         //                 int date;
+                                       
+                         //                 date = PublicDataClass._DataField.Buffer[k + 2 + 14] + (PublicDataClass._DataField.Buffer[k + 3 + 14] << 8);
+
+                         //                 k += 2;
+                         //                 if (date > 0x8000)
+                         //                     date = date - 65536; 
+                         //                 lv1.SubItems.Add(Convert.ToString(date));//数值
+
+                         //             }
+                         //                 lv1.SubItems.Add("无");
+                         //                 lv1.SubItems.Add("无");
+                         //                 listView1.Items.Add(lv1);
+                         //                 datapos++;
+                         //         }
+                         //         YCdatapos++;
+                         //         startp++;
+                         //         if (YCdatapos >= PublicDataClass.SaveText.Cfg[dx].YccfgNum)
+                         //         {
+                         //             YCdatapos = 0;
+                         //         }
+                 
+                         //         StartPos++;
+                         //     }// end of for (int jj = 0; jj < PublicDataClass._DataField.FieldVSQ; jj++)
+
+
+                         // }//end of  if (PublicDataClass.ChanelId == 2)
+
+                         //else if (PublicDataClass.ChanelId == 1 || PublicDataClass.ChanelId == 3)
+                         //{
+                         //    for (int j = 0; j < PublicDataClass._DataField.FieldVSQ; j++)
+                         //    {
+    
+                         //        ListViewItem lv1 = new ListViewItem(String.Format("{0:d}", YCdatapos));
+
+                         //        StartPos += PublicDataClass._DataField.Buffer[k + 14] + (PublicDataClass._DataField.Buffer[k+1 + 14] << 8);
+                         //        StartName = PublicFunction.FindStartPosCorrelativeName(1, StartPos, dx);       //找起始点号
+                         //        startp = PublicFunction.FindStartPos(1, StartPos, dx);//找起始点号位置
+                         //        lv1.SubItems.Add(PublicDataClass.SaveText.Cfg[dx].YccfgName[Convert.ToInt16(PublicDataClass._YcInformationParam.IndexTable[YCdatapos])]);             //名称   
+
+                         //        if (datatype == 1)//浮点型显示            
+                         //        {
+
+                         //            bytes[0] = PublicDataClass._DataField.Buffer[k + 2 + 14];
+                         //            bytes[1] = PublicDataClass._DataField.Buffer[k + 3 + 14];
+                         //            bytes[2] = PublicDataClass._DataField.Buffer[k + 4 + 14];
+                         //            bytes[3] = PublicDataClass._DataField.Buffer[k + 5 + 14];
+
+                         //            fdata = BitConverter.ToSingle(bytes, 0);
+                         //            k += 6;
+                                    
+                         //            lv1.SubItems.Add(String.Format("{0:f4}", fdata));//数值
+                         //        }
+                         //        if (datatype == 0)//整型显示 
+                         //        {                     
+                         //            int date;
+                         //            date = PublicDataClass._DataField.Buffer[k + 2 + 14] + (PublicDataClass._DataField.Buffer[k + 3 + 14] << 8);
+                         //            k += 4;
+                         //            if (date > 0x8000)
+                         //                date = date - 65536;
+                         //            lv1.SubItems.Add(Convert.ToString(date));//数值
+                         //        }
+                         //        lv1.SubItems.Add("无");
+                         //        lv1.SubItems.Add("无");
+                         //        listView1.Items.Add(lv1);
+                         //        datapos++;
+
+                         //        YCdatapos++;
+                         //        startp++;
+
+                         //        if (YCdatapos >= PublicDataClass.SaveText.Cfg[dx].YccfgNum)
+                         //        {
+                         //            YCdatapos = 0;
+                         //        }
+
+                         //        StartPos++;
+                         //    }
+
+
+                         //}//  end of else if (PublicDataClass.ChanelId == 1 || PublicDataClass.ChanelId == 3)
+            int dex = 0; string strdata = @"";
+            if (PublicDataClass._DataField.FieldLen < 5)
+            {
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", 0));
+                lv.SubItems.Add("无数据记录");
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                listView1.Items.Add(lv);
+                return;
+            }
+            if (datapos == 0)
+            {
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", datapos));
+
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8));
+                strdata += "年";
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex + 2] + (PublicDataClass._DataField.Buffer[dex + 3] << 8));
+                strdata += "月";
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex + 4] + (PublicDataClass._DataField.Buffer[dex + 5] << 8));  //日+星期
+                strdata += "日";
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex + 6] + (PublicDataClass._DataField.Buffer[dex + 7] << 8));
+                strdata += "时";
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex + 8] + (PublicDataClass._DataField.Buffer[dex + 9] << 8));
+                strdata += "分";
+                lv.SubItems.Add(strdata);
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                listView1.Items.Add(lv);
+                datapos++;
+            }
+            dex += 10;
+            for (int j = 0; j < (PublicDataClass._DataField.FieldLen - 10) / 2; j++)
+            {
+
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", datapos));
+                lv.SubItems.Add(PublicDataClass._HisData.YcNameTable[pos]);
+
+                int data = PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8);
+                dex += 2;
+                lv.SubItems.Add(Convert.ToString(data));
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                listView1.Items.Add(lv);
+                pos++;
+                datapos++;
+            }
+            }
+
+        private void ShowTjHisData()
+        {
+            int dex = 0; string strdata = @"";
+            if (PublicDataClass._DataField.FieldLen < 5)
+            {
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", 0));
+                lv.SubItems.Add("无数据记录");
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                listView1.Items.Add(lv);
+                return;
+            }
+            if (datapos == 0)
+            {
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", datapos));
+
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8));
+                strdata += "年";
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex + 2] + (PublicDataClass._DataField.Buffer[dex + 3] << 8));
+                strdata += "月";
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex + 4] + (PublicDataClass._DataField.Buffer[dex + 5] << 8));  //日+星期
+                strdata += "日";
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex + 6] + (PublicDataClass._DataField.Buffer[dex + 7] << 8));
+                strdata += "时";
+                strdata += String.Format("{0:x}", PublicDataClass._DataField.Buffer[dex + 8] + (PublicDataClass._DataField.Buffer[dex + 9] << 8));
+                strdata += "分";
+                lv.SubItems.Add(strdata);
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                listView1.Items.Add(lv);
+                datapos++;
+            }
+            dex += 10;
+            for (int j = 0; j < (PublicDataClass._DataField.FieldLen - 10) / 2; j++)
+            {
+
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", datapos));
+                lv.SubItems.Add(PublicDataClass._HisData.TjNameTable[pos]);
+
+                int data = PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8);
+                dex += 2;
+                lv.SubItems.Add(Convert.ToString(data));
+                lv.SubItems.Add("无");
+                lv.SubItems.Add("无");
+                listView1.Items.Add(lv);
+                pos++;
+                datapos++;
+            }
+        }
+        
+        private void ShowHisRecordData(byte ty)
+        {
+            listView1.Items.Clear();
+            int dex = 0; string strdata = @"";
+            if (ty == 1)
+            {
+                for (int j = 0; j <PublicDataClass._DataField.FieldVSQ; j++)
+                {
+                    strdata = @"";
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", datapos));
+                     //if(PublicDataClass._DataField.Buffer[dex+2]<27)
+                    if (PublicDataClass._DataField.Buffer[dex ] < 27)
+                     {
+
+                    int channel = PublicDataClass._DataField.Buffer[dex];
+                    lv.SubItems.Add(Convert.ToString(PublicDataClass.ThreeYNameTable.YxTable[channel]));
+
+                    strdata += String.Format("[状态]:{0:x}", PublicDataClass._DataField.Buffer[dex +1]) +"---发生的时间:";
+
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 2]);
+                    strdata += "年";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 3]);
+                    strdata += "月";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 4]);  //日+星期
+                    strdata += "日";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 5]);
+                    strdata += "时";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 6]);
+                    strdata += "分";
+                    //int ms = (PublicDataClass._DataField.Buffer[dex +8] << 8) +
+                    //          PublicDataClass._DataField.Buffer[dex +9];
+
+                    //strdata += String.Format("{0:d}", ms);
+                    //strdata += "毫秒";
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 5]);
+                    //strdata += "年";
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 6]);
+                    //strdata += "月";
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex +7]);  //日+星期
+                    //strdata += "日";
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 8]);
+                    //strdata += "时";
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 9]);
+                    //strdata += "分";
+                    lv.SubItems.Add(strdata);
+                    lv.SubItems.Add("无");
+                    lv.SubItems.Add("无");
+                    listView1.Items.Add(lv);
+                     }
+                    datapos++;
+                    dex += 7;
+                 }
+            }
+            else if (ty == 2)
+            {
+                //string DataInfo = @"";
+                //ListViewItem lv = new ListViewItem(String.Format("{0:d}", listView1.Items.Count));
+                //lv.SubItems.Add("<故障电流信息>");
+                //DataInfo = "";
+                //DataInfo += "发生的时间:";
+                //DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex]);   //年
+                //DataInfo += "年";
+                //DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 1]);  //月
+                //DataInfo += "月";
+                //DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 2]);  //日
+                //DataInfo += "日";
+                //DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 3]);  //时
+                //DataInfo += "时";
+                //DataInfo += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 4]);  //分
+                //DataInfo += "分";
+                //lv.SubItems.Add(DataInfo);
+                //lv.SubItems.Add("无");
+                //lv.SubItems.Add("无");
+                //lv.SubItems.Add("无");
+                //listView1.Items.Add(lv);
+                //dex = 5;
+                //for (int i = 0; i < PublicDataClass._DataField.FieldVSQ; i++)
+                //{
+                //    int StartAddr = 0;
+                //    StartAddr = PublicDataClass._DataField.Buffer[dex] + (PublicDataClass._DataField.Buffer[dex + 1] << 8);
+                //    ListViewItem ls= new ListViewItem(String.Format("{0:d}", listView1.Items.Count));
+                //    ls.SubItems.Add("<遥测量>");
+                //    ls.SubItems.Add(Convert.ToString(PublicDataClass.ThreeYNameTable.YcTable[StartAddr - 0x4001]));   //加入名称
+
+                //    int data = (PublicDataClass._DataField.Buffer[dex + 3] << 8) + PublicDataClass._DataField.Buffer[dex + 2];
+                //    if (data > 0x8000)
+                //        data = data - 65536;
+                //    ls.SubItems.Add(Convert.ToString(data));
+
+                //    ls.SubItems.Add("无");
+                //    listView1.Items.Add(ls);
+                //    dex += 4;
+                 for (int j = 0; j <PublicDataClass._DataField.FieldVSQ; j++)
+                {
+                    strdata = @"";
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", datapos));
+                     if(PublicDataClass._DataField.Buffer[dex+2]>26)
+                     {
+                         strdata += String.Format("[电流故障值]:{0:d}", (PublicDataClass._DataField.Buffer[dex] + PublicDataClass._DataField.Buffer[dex + 1] << 8));             
+                    int channel = PublicDataClass._DataField.Buffer[dex+2];
+                    lv.SubItems.Add(Convert.ToString(PublicDataClass.ThreeYNameTable.YxTable[channel]));
+
+                    strdata += String.Format("[状态]:{0:x}", PublicDataClass._DataField.Buffer[dex +3]) +"---发生的时间:";
+
+                    
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 5]);
+                    strdata += "年";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 6]);
+                    strdata += "月";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex +7]);  //日+星期
+                    strdata += "日";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 8]);
+                    strdata += "时";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 9]);
+                    strdata += "分";
+                    lv.SubItems.Add(strdata);
+
+                    lv.SubItems.Add("无");
+                    lv.SubItems.Add("无");
+                    listView1.Items.Add(lv);
+                     }
+                        
+
+                    datapos++;
+                    dex += 12;
+                 }
+                }
+            
+            else  if (ty == 3)
+            {
+                for (int j = 0; j < PublicDataClass._DataField.FieldVSQ; j++)
+                {
+                    strdata = @"";
+                    string  a= @"";
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", datapos));
+
+                    int channel = PublicDataClass._DataField.Buffer[dex];
+                    a += String.Format("遥控线路:{0:x}", channel) ;
+                    lv.SubItems.Add(a);
+
+                    strdata += String.Format("[状态]:{0:x}", PublicDataClass._DataField.Buffer[dex + 1]) + "---发生的时间:";
+
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 3]);
+                    //strdata += "年";
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 4]);
+                    //strdata += "月";
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 5]);  //日+星期
+                    //strdata += "日";
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 6]);
+                    //strdata += "时";
+                    //strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 7]);
+                    //strdata += "分";
+                    //int ms = (PublicDataClass._DataField.Buffer[dex + 8] << 8) +
+                    //          PublicDataClass._DataField.Buffer[dex + 9];
+
+                    //strdata += String.Format("{0:d}", ms);
+                    //strdata += "毫秒";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 7]);
+                    strdata += "年";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 6]);
+                    strdata += "月";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 5]);  //日+星期
+                    strdata += "日";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 4]);
+                    strdata += "时";
+                    strdata += String.Format("{0:d}", PublicDataClass._DataField.Buffer[dex + 3]);
+                    strdata += "分";
+                    lv.SubItems.Add(strdata);
+                    lv.SubItems.Add("无");
+                    lv.SubItems.Add("无");
+                    listView1.Items.Add(lv);
+                    datapos++;
+                    dex += 12;
+                }
+            }
+
+        }
+
+
+
+        private void buttonclear_Click(object sender, EventArgs e)
+        {
+            datapos = 0;
+            pos     = 0;
+            listView1.Items.Clear();
+        }
+
+        private void buttonoutput_Click(object sender, EventArgs e)
+        {
+            if (listView1.Items.Count == 0)
+            {
+                MessageBox.Show("记录项内容为空", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else
+            {
+                SaveFileDialog savefile = new SaveFileDialog();
+                savefile.Filter = "*.xls|*.*";
+                saveret = savefile.ShowDialog() == DialogResult.OK;
+                savename = savefile.FileName;
+                buttonoutput.Text = "导出中..";
+                savefile.Dispose();
+
+            }
+        }
+        #region ExportToExcel
+        /// <summary>
+        ///  导出--excel
+        /// </summary>
+
+        private void ExportToExcel(string path)
+        {
+
+            //Microsoft.Office.Interop.Excel.ApplicationClass excel = new Microsoft.Office.Interop.Excel.ApplicationClass();
+            //excel.Application.Workbooks.Add(true);
+            OperateExcel Ex = new OperateExcel();   //新建一个excel文件
+            Ex.CreateNewExcel();
+
+            for (int i = 0; i < listView1.Columns.Count; i++)
+            {
+                Ex.SetCellValue(Ex.ws, 1, i + 1, listView1.Columns[i].Text);
+            }
+
+            for (int i = 0; i < listView1.Items.Count; i++)
+            {
+                for (int j = 0; j < listView1.Columns.Count; j++)
+                {
+
+                    Ex.SetCellValue(Ex.ws, i + 2, j + 1, listView1.Items[i].SubItems[j].Text);
+                }
+            }
+            Ex.SaveAsExcel(savename);
+            Ex.CloseExcel();
+        }
+        #endregion
+
+        private void comboBoxData_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxData.SelectedIndex < 3)
+            {
+                dateTimePickerbegindata.Enabled = false;
+                dateTimePickerbegintime.Enabled = false;
+                dateTimePickerenddata.Enabled   = false;
+                dateTimePickerendtime.Enabled   = false;
+                dUpDown.Enabled = false;
+                textBoxto.Enabled = true;
+                textBoxfrom.Enabled = true;
+            }
+            else
+            {
+    
+
+                dateTimePickerbegindata.Enabled = true;
+                dateTimePickerbegintime.Enabled = true;
+                dateTimePickerenddata.Enabled = true;
+                dateTimePickerendtime.Enabled = true;
+                dUpDown.Enabled = true;
+                textBoxto.Enabled = false;
+                textBoxfrom.Enabled = false;
+               // comboBoxaddr.Enabled = false;
+              //  checkBox1.Enabled = false;
+            }
+        }
+    }
+}

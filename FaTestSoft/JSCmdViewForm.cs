@@ -1,0 +1,241 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using FaTestSoft.CommonData;
+using FaTestSoft.FUNCTIONCLASS;
+
+namespace FaTestSoft
+{
+    public partial class JSCmdViewForm : Form
+    {
+        public JSCmdViewForm()
+        {
+            InitializeComponent();
+        }
+        [DllImport("DataConVert.dll")]
+            private static extern void InttoByte(int source, ref byte pdata);
+
+        private int ty;
+        
+        
+        private void JSCmdViewForm_Load(object sender, EventArgs e)
+        {
+            textBoxyear.Text = Convert.ToString(DateTime.Now.Year);             //获取系统时间
+            textBoxmon.Text  = Convert.ToString(DateTime.Now.Month);
+            textBoxdata.Text = Convert.ToString(DateTime.Now.Day);
+            textBoxhour.Text = Convert.ToString(DateTime.Now.Hour);
+            textBoxmin.Text  = Convert.ToString(DateTime.Now.Minute);
+            textBoxsec.Text  = Convert.ToString(DateTime.Now.Second);
+            textBoxms.Text   = Convert.ToString(DateTime.Now.Millisecond);
+        }
+
+        private void JSCmdViewForm_SizeChanged(object sender, EventArgs e)
+        {
+            groupBox1.Width = this.Width;
+            groupBox1.Height = this.Height / 2;
+            groupBox1.Top = this.Location.X;
+            groupBox1.Left = 0;
+
+            groupBox2.Width = this.Width;
+            groupBox2.Height = this.Height / 2;
+            groupBox2.Top = this.Location.X + groupBox1.Height;
+            groupBox2.Left = 0;
+        }
+
+        private void buttonsystime_Click(object sender, EventArgs e)
+        {
+            textBoxyear.Text = Convert.ToString(DateTime.Now.Year);             //获取系统时间
+            textBoxmon.Text = Convert.ToString(DateTime.Now.Month);
+            textBoxdata.Text = Convert.ToString(DateTime.Now.Day);
+            textBoxhour.Text = Convert.ToString(DateTime.Now.Hour);
+            textBoxmin.Text = Convert.ToString(DateTime.Now.Minute);
+            textBoxsec.Text = Convert.ToString(DateTime.Now.Second);
+            textBoxms.Text = Convert.ToString(DateTime.Now.Millisecond);
+        }
+        
+
+        private void buttonjs_Click(object sender, EventArgs e)
+        {
+            if (PublicDataClass.LinSPointName == "无信息")
+            {
+                MessageBox.Show("无测量点信息可操作", "信息",
+                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+
+            }
+            else
+            {
+                ty = PublicFunction.CheckPointOfCommunicationEntrace(PublicDataClass.LinSPointName);
+                if (ty == 0)
+                {
+                    MessageBox.Show("无测量点信息可操作", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+
+                }
+
+            }
+
+            //int mstime = Convert.ToInt16(textBoxsec.Text) * 1000 + Convert.ToInt16(textBoxms.Text);
+
+            //byte data = Convert.ToByte(Convert.ToInt16(textBoxdata.Text) & 0x1f);
+            //byte data2 = Convert.ToByte((Convert.ToInt16(DateTime.Now.DayOfWeek) & 0x07) << 5);
+  
+
+            //PublicDataClass._DataField.FieldLen  = 0;
+            //InttoByte(mstime, ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+            //PublicDataClass._DataField.FieldLen +=2;
+            //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] =Convert.ToByte(textBoxmin.Text);
+            //PublicDataClass._DataField.FieldLen ++;
+            //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] =Convert.ToByte(textBoxhour.Text);
+            //PublicDataClass._DataField.FieldLen ++;
+            //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] =Convert.ToByte(data | data2);
+            //PublicDataClass._DataField.FieldLen ++;
+            //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(textBoxmon.Text);
+            //PublicDataClass._DataField.FieldLen ++;
+            //PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] =Convert.ToByte( Convert.ToInt16(textBoxyear.Text)-2000);
+            //PublicDataClass._DataField.FieldLen ++;
+
+            //PublicDataClass.ParamInfoAddr = 0;
+            int mstime = Convert.ToInt16(textBoxsec.Text) * 1000 + Convert.ToInt16(textBoxms.Text);
+
+            byte data = Convert.ToByte(Convert.ToInt16(textBoxdata.Text) & 0x1f);
+
+            byte data2 = 0;
+            DateTime thedate = new DateTime();
+            thedate = Convert.ToDateTime(textBoxyear.Text + "-" + textBoxmon.Text + "-" + textBoxdata.Text);
+
+            //= Convert.ToByte((Convert.ToInt16(thedate.DayOfWeek) & 0x07) << 5);
+            switch (thedate.DayOfWeek)
+            {
+                case DayOfWeek.Monday:
+                    data2 = 1;
+                    break;
+                case DayOfWeek.Tuesday:
+                    data2 = 2;
+                    break;
+                case DayOfWeek.Wednesday:
+                    data2 = 3;
+                    break;
+                case DayOfWeek.Thursday:
+                    data2 = 4;
+                    break;
+                case DayOfWeek.Friday:
+                    data2 = 5;
+                    break;
+                case DayOfWeek.Saturday:
+                    data2 = 6;
+                    break;
+                case DayOfWeek.Sunday:
+                    data2 = 7;
+                    break;
+                default:
+                    data2 = 0;
+                    break;
+            }
+            data2 <<= 5;
+            PublicDataClass._DataField.FieldLen = 0;
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = (byte)(mstime & 0x00ff);
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = (byte)((mstime& 0xff00) >> 8);
+         //   InttoByte(mstime, ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+            PublicDataClass._DataField.FieldLen += 2;
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(textBoxmin.Text);
+            PublicDataClass._DataField.FieldLen++;
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(textBoxhour.Text);
+            PublicDataClass._DataField.FieldLen++;
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(data | data2);
+            PublicDataClass._DataField.FieldLen++;
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(textBoxmon.Text);
+            PublicDataClass._DataField.FieldLen++;
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(Convert.ToInt16(textBoxyear.Text) - 2000);
+            PublicDataClass._DataField.FieldLen++;
+
+            PublicDataClass.ParamInfoAddr = 0;
+
+            if (ty == 1)
+                PublicDataClass._ComTaskFlag.C_CS_NA_1 = true;
+
+            if (ty == 2)
+                PublicDataClass._NetTaskFlag.C_CS_NA_1 = true;
+            //if (ty == 3)
+            //    PublicDataClass._GprsTaskFlag.C_CS_NA_1 = true;
+
+        }
+
+        private void textBoxmon_TextChanged(object sender, EventArgs e)
+        {
+            if (Convert.ToInt16(textBoxmon.Text) > 12)
+            {
+                MessageBox.Show("输入月份非法", "信息",
+                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxmon.Text = Convert.ToString(DateTime.Now.Month);
+            }
+        }
+
+        private void textBoxdata_TextChanged(object sender, EventArgs e)
+        {
+            if (Convert.ToInt16(textBoxdata.Text) > 31)
+            {
+                MessageBox.Show("输入天数非法", "信息",
+                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxdata.Text = Convert.ToString(DateTime.Now.Day);
+            }
+        }
+
+        private void textBoxhour_TextChanged(object sender, EventArgs e)
+        {
+            if (Convert.ToInt16(textBoxhour.Text) > 24)
+            {
+                MessageBox.Show("输入小时非法", "信息",
+                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxhour.Text = Convert.ToString(DateTime.Now.Hour);
+            }
+        }
+
+        private void textBoxsec_TextChanged(object sender, EventArgs e)
+        {
+            if (Convert.ToInt16(textBoxsec.Text) > 59)
+            {
+                MessageBox.Show("输入秒非法", "信息",
+                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxsec.Text = Convert.ToString(DateTime.Now.Second);
+            }
+        }
+
+        private void textBoxms_TextChanged(object sender, EventArgs e)
+        {
+            if (Convert.ToInt16(textBoxms.Text) > 1000)
+            {
+                MessageBox.Show("输入毫秒非法", "信息",
+                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxms.Text = Convert.ToString(DateTime.Now.Millisecond);
+            }
+        }
+
+        private void textBoxmin_TextChanged(object sender, EventArgs e)
+        {
+            if (Convert.ToInt16(textBoxmin.Text) > 59)
+            {
+                MessageBox.Show("输入分钟非法", "信息",
+                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBoxmin.Text = Convert.ToString(DateTime.Now.Minute);
+            }
+        }
+
+        private void JSCmdViewForm_VisibleChanged(object sender, EventArgs e)
+        {
+            textBoxyear.Text = Convert.ToString(DateTime.Now.Year);             //获取系统时间
+            textBoxmon.Text = Convert.ToString(DateTime.Now.Month);
+            textBoxdata.Text = Convert.ToString(DateTime.Now.Day);
+            textBoxhour.Text = Convert.ToString(DateTime.Now.Hour);
+            textBoxmin.Text = Convert.ToString(DateTime.Now.Minute);
+            textBoxsec.Text = Convert.ToString(DateTime.Now.Second);
+            textBoxms.Text = Convert.ToString(DateTime.Now.Millisecond);
+        }
+    }
+}

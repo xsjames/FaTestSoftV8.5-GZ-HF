@@ -1,0 +1,693 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2A77423A-96B1-4DA9-AB63-B178DFF11D6A}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FaTestSoft</RootNamespace>
+    <AssemblyName>配网测试维护软件</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationIcon>30.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="IPAddressControl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
+    <Reference Include="RichTextBoxExtended, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\RichTextBoxExtended\bin\Debug\RichTextBoxExtended.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AcquisitionDocmentView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AcquisitionDocmentView.Designer.cs">
+      <DependentUpon>AcquisitionDocmentView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddInfoAddrViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddInfoAddrViewForm.Designer.cs">
+      <DependentUpon>AddInfoAddrViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddParamRecordViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddParamRecordViewForm.Designer.cs">
+      <DependentUpon>AddParamRecordViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddParamRecordViewForm2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddParamRecordViewForm2.Designer.cs">
+      <DependentUpon>AddParamRecordViewForm2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddRoleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddRoleForm.Designer.cs">
+      <DependentUpon>AddRoleForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddYkRecordForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddYkRecordForm.Designer.cs">
+      <DependentUpon>AddYkRecordForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CallDataDocmentView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CallDataDocmentView.Designer.cs">
+      <DependentUpon>CallDataDocmentView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CallTypeViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CallTypeViewForm.Designer.cs">
+      <DependentUpon>CallTypeViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CeLPointListViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CeLPointListViewForm.Designer.cs">
+      <DependentUpon>CeLPointListViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CePointClassView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CePointClassView.Designer.cs">
+      <DependentUpon>CePointClassView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ChangeInfoViewDocment.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChangeInfoViewDocment.Designer.cs">
+      <DependentUpon>ChangeInfoViewDocment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ChannelClassViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChannelClassViewForm.Designer.cs">
+      <DependentUpon>ChannelClassViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CModifyViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CModifyViewForm.Designer.cs">
+      <DependentUpon>CModifyViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CModifyViewForm1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CModifyViewForm1.Designer.cs">
+      <DependentUpon>CModifyViewForm1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CModifyViewForm2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CModifyViewForm2.Designer.cs">
+      <DependentUpon>CModifyViewForm2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CodeUpdateViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeUpdateViewForm.Designer.cs">
+      <DependentUpon>CodeUpdateViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ComParamForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ComParamForm.Designer.cs">
+      <DependentUpon>ComParamForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlDocmentView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlDocmentView.Designer.cs">
+      <DependentUpon>ControlDocmentView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CreateNewPrjForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateNewPrjForm.Designer.cs">
+      <DependentUpon>CreateNewPrjForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceInfoAddr.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceInfoAddr.Designer.cs">
+      <DependentUpon>DeviceInfoAddr.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceParamForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceParamForm.Designer.cs">
+      <DependentUpon>DeviceParamForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DocumentView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DocumentView.Designer.cs">
+      <DependentUpon>DocumentView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FibreParamForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FibreParamForm.Designer.cs">
+      <DependentUpon>FibreParamForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FileCmdViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileCmdViewForm.Designer.cs">
+      <DependentUpon>FileCmdViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddParamRecordViewForm1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddParamRecordViewForm1.Designer.cs">
+      <DependentUpon>AddParamRecordViewForm1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="fsxbh.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="fsxbh.Designer.cs">
+      <DependentUpon>fsxbh.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FuGuiCmdViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FuGuiCmdViewForm.Designer.cs">
+      <DependentUpon>FuGuiCmdViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FunctionListView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FunctionListView.Designer.cs">
+      <DependentUpon>FunctionListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GprsParamForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GprsParamForm.Designer.cs">
+      <DependentUpon>GprsParamForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GraphicDocmentViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GraphicDocmentViewForm.Designer.cs">
+      <DependentUpon>GraphicDocmentViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryDataDocmemtView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HistoryDataDocmemtView.Designer.cs">
+      <DependentUpon>HistoryDataDocmemtView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IniCfgDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IniCfgDlg.designer.cs">
+      <DependentUpon>IniCfgDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InitGlobalData.cs" />
+    <Compile Include="JSCmdViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="JSCmdViewForm.Designer.cs">
+      <DependentUpon>JSCmdViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListViewEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ListViewExtern.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ListViewExtern.Designer.cs">
+      <DependentUpon>ListViewExtern.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainDocmentView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainDocmentView.Designer.cs">
+      <DependentUpon>MainDocmentView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ModifyAddrForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModifyAddrForm.Designer.cs">
+      <DependentUpon>ModifyAddrForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="monitor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="monitor.Designer.cs">
+      <DependentUpon>monitor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OpenLinkForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OpenLinkForm.Designer.cs">
+      <DependentUpon>OpenLinkForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OperateExcel.cs" />
+    <Compile Include="Origination.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Origination.Designer.cs">
+      <DependentUpon>Origination.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OtherTypeDocmentView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OtherTypeDocmentView.Designer.cs">
+      <DependentUpon>OtherTypeDocmentView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OutputWindows.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OutputWindows.Designer.cs">
+      <DependentUpon>OutputWindows.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Page.cs" />
+    <Compile Include="ParamAntoLoadForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ParamAntoLoadForm.Designer.cs">
+      <DependentUpon>ParamAntoLoadForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AcquisitionDocmentView.resx">
+      <DependentUpon>AcquisitionDocmentView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddInfoAddrViewForm.resx">
+      <DependentUpon>AddInfoAddrViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddParamRecordViewForm.resx">
+      <DependentUpon>AddParamRecordViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddParamRecordViewForm2.resx">
+      <DependentUpon>AddParamRecordViewForm2.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddRoleForm.resx">
+      <DependentUpon>AddRoleForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddYkRecordForm.resx">
+      <DependentUpon>AddYkRecordForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CallDataDocmentView.resx">
+      <DependentUpon>CallDataDocmentView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CallTypeViewForm.resx">
+      <DependentUpon>CallTypeViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CeLPointListViewForm.resx">
+      <DependentUpon>CeLPointListViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CePointClassView.resx">
+      <DependentUpon>CePointClassView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChangeInfoViewDocment.resx">
+      <DependentUpon>ChangeInfoViewDocment.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChannelClassViewForm.resx">
+      <DependentUpon>ChannelClassViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CModifyViewForm.resx">
+      <DependentUpon>CModifyViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CModifyViewForm1.resx">
+      <DependentUpon>CModifyViewForm1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CModifyViewForm2.resx">
+      <DependentUpon>CModifyViewForm2.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeUpdateViewForm.resx">
+      <DependentUpon>CodeUpdateViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ComParamForm.resx">
+      <DependentUpon>ComParamForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlDocmentView.resx">
+      <DependentUpon>ControlDocmentView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateNewPrjForm.resx">
+      <DependentUpon>CreateNewPrjForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceInfoAddr.resx">
+      <DependentUpon>DeviceInfoAddr.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeviceParamForm.resx">
+      <DependentUpon>DeviceParamForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DocumentView.resx">
+      <DependentUpon>DocumentView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FibreParamForm.resx">
+      <DependentUpon>FibreParamForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileCmdViewForm.resx">
+      <DependentUpon>FileCmdViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddParamRecordViewForm1.resx">
+      <DependentUpon>AddParamRecordViewForm1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="fsxbh.resx">
+      <DependentUpon>fsxbh.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FuGuiCmdViewForm.resx">
+      <DependentUpon>FuGuiCmdViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FunctionListView.resx">
+      <DependentUpon>FunctionListView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GprsParamForm.resx">
+      <DependentUpon>GprsParamForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GraphicDocmentViewForm.resx">
+      <DependentUpon>GraphicDocmentViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HistoryDataDocmemtView.resx">
+      <DependentUpon>HistoryDataDocmemtView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IniCfgDlg.resx">
+      <DependentUpon>IniCfgDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="JSCmdViewForm.resx">
+      <DependentUpon>JSCmdViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainDocmentView.resx">
+      <DependentUpon>MainDocmentView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ModifyAddrForm.resx">
+      <DependentUpon>ModifyAddrForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="monitor.resx">
+      <DependentUpon>monitor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenLinkForm.resx">
+      <DependentUpon>OpenLinkForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Origination.resx">
+      <DependentUpon>Origination.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OtherTypeDocmentView.resx">
+      <DependentUpon>OtherTypeDocmentView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OutputWindows.resx">
+      <DependentUpon>OutputWindows.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ParamAntoLoadForm.resx">
+      <DependentUpon>ParamAntoLoadForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RealTDataDocmentView.resx">
+      <DependentUpon>RealTDataDocmentView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ResetCmdViewForm.resx">
+      <DependentUpon>ResetCmdViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RetryCmdViewForm.resx">
+      <DependentUpon>RetryCmdViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RoleManagerDocmentForm.resx">
+      <DependentUpon>RoleManagerDocmentForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SysPDocmentView.resx">
+      <DependentUpon>SysPDocmentView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ToolBox.resx">
+      <DependentUpon>ToolBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TransmitDataForm.resx">
+      <DependentUpon>TransmitDataForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="YkCmdViewForm.resx">
+      <DependentUpon>YkCmdViewForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="PublicDataClass.cs" />
+    <Compile Include="PublicFunction.cs" />
+    <Compile Include="RealTDataDocmentView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RealTDataDocmentView.Designer.cs">
+      <DependentUpon>RealTDataDocmentView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResetCmdViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResetCmdViewForm.Designer.cs">
+      <DependentUpon>ResetCmdViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RetryCmdViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RetryCmdViewForm.Designer.cs">
+      <DependentUpon>RetryCmdViewForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RoleManagerDocmentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RoleManagerDocmentForm.Designer.cs">
+      <DependentUpon>RoleManagerDocmentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SysPDocmentView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SysPDocmentView.Designer.cs">
+      <DependentUpon>SysPDocmentView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ToolBox.Designer.cs">
+      <DependentUpon>ToolBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TransmitDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransmitDataForm.Designer.cs">
+      <DependentUpon>TransmitDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="USB.cs">
+    </Compile>
+    <Compile Include="WriteReadAllFile.cs" />
+    <Compile Include="YkCmdViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="YkCmdViewForm.Designer.cs">
+      <DependentUpon>YkCmdViewForm.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FLD308.ICO" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Lime1.ICO" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Linux-vs-Win-2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Open Step 4 Scheduled Tasks.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\5046104fe051ad3fafc3abaa.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BeIDE.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DockToolBar\DockToolBar.csproj">
+      <Project>{7BA431FC-F5EB-4232-BBD2-E59B40989AE6}</Project>
+      <Name>DockToolBar</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj">
+      <Project>{C75532C4-765B-418E-B09B-46D36B2ABDB1}</Project>
+      <Name>WinFormsUI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\22.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\19.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CONNECT.ICO" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\27-Be98 Shortcut.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CHECKMRK.ICO" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\W95MBX01.ICO" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BeBox - Icon Library_Ico_12.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\040bn.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\powermacg4.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\18.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\18.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\limegreen.ICO" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\5046104fe052ad3fafc3abab.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ICO16.ICO" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="30.ico" />
+    <None Include="Resources\ICO42.ICO" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,148 @@
+﻿namespace FaTestSoft
+{
+    partial class AddParamRecordViewForm
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.label1 = new System.Windows.Forms.Label();
+            this.textBoxname = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBoxvalue = new System.Windows.Forms.TextBox();
+            this.textBoxbeilv = new System.Windows.Forms.TextBox();
+            this.buttonok = new System.Windows.Forms.Button();
+            this.buttoncel = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(13, 27);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(47, 12);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "名  称:";
+            // 
+            // textBoxname
+            // 
+            this.textBoxname.Location = new System.Drawing.Point(82, 24);
+            this.textBoxname.Name = "textBoxname";
+            this.textBoxname.Size = new System.Drawing.Size(158, 21);
+            this.textBoxname.TabIndex = 1;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(13, 82);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(47, 12);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "数  值:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(13, 141);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(47, 12);
+            this.label3.TabIndex = 3;
+            this.label3.Text = "倍  率:";
+            // 
+            // textBoxvalue
+            // 
+            this.textBoxvalue.Location = new System.Drawing.Point(82, 82);
+            this.textBoxvalue.Name = "textBoxvalue";
+            this.textBoxvalue.Size = new System.Drawing.Size(158, 21);
+            this.textBoxvalue.TabIndex = 4;
+            this.textBoxvalue.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxvalue_KeyPress);
+            // 
+            // textBoxbeilv
+            // 
+            this.textBoxbeilv.Location = new System.Drawing.Point(82, 138);
+            this.textBoxbeilv.Name = "textBoxbeilv";
+            this.textBoxbeilv.Size = new System.Drawing.Size(158, 21);
+            this.textBoxbeilv.TabIndex = 5;
+            // 
+            // buttonok
+            // 
+            this.buttonok.Location = new System.Drawing.Point(15, 194);
+            this.buttonok.Name = "buttonok";
+            this.buttonok.Size = new System.Drawing.Size(75, 23);
+            this.buttonok.TabIndex = 6;
+            this.buttonok.Text = "确  定";
+            this.buttonok.UseVisualStyleBackColor = true;
+            this.buttonok.Click += new System.EventHandler(this.buttonok_Click);
+            // 
+            // buttoncel
+            // 
+            this.buttoncel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.buttoncel.Location = new System.Drawing.Point(169, 193);
+            this.buttoncel.Name = "buttoncel";
+            this.buttoncel.Size = new System.Drawing.Size(75, 23);
+            this.buttoncel.TabIndex = 7;
+            this.buttoncel.Text = "取  消";
+            this.buttoncel.UseVisualStyleBackColor = true;
+            // 
+            // AddParamRecordViewForm
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.InactiveCaptionText;
+            this.ClientSize = new System.Drawing.Size(258, 239);
+            this.Controls.Add(this.buttoncel);
+            this.Controls.Add(this.buttonok);
+            this.Controls.Add(this.textBoxbeilv);
+            this.Controls.Add(this.textBoxvalue);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.textBoxname);
+            this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "AddParamRecordViewForm";
+            this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "添加参数记录";
+            this.Load += new System.EventHandler(this.AddParamRecordViewForm_Load);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textBoxname;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBoxvalue;
+        private System.Windows.Forms.TextBox textBoxbeilv;
+        private System.Windows.Forms.Button buttonok;
+        private System.Windows.Forms.Button buttoncel;
+    }
+}

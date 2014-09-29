@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using FaTestSoft.CommonData;
+
+namespace FaTestSoft
+{
+    public partial class AddParamRecordViewForm : Form
+    {
+        public AddParamRecordViewForm()
+        {
+            InitializeComponent();
+        }
+
+        private void AddParamRecordViewForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonok_Click(object sender, EventArgs e)
+        {
+            if (textBoxname.Text == "")
+            {
+                MessageBox.Show("名称记录项为空！", "提示",
+                  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (textBoxvalue.Text == "")
+            {
+                MessageBox.Show("数值记录项为空！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (textBoxbeilv.Text== "")
+            {
+                MessageBox.Show("倍率记录项为空！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            PublicDataClass._AddParamRecord.Name  = textBoxname.Text;
+            PublicDataClass._AddParamRecord.Value = textBoxvalue.Text;
+            PublicDataClass._AddParamRecord.Beilv = textBoxbeilv.Text;
+
+            this.DialogResult = DialogResult.OK;
+        }
+
+        private void textBoxvalue_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar != '\b')//这是允许输入退格键
+            {
+                if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                {
+
+                    MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Handled = true;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,115 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using FaTestSoft.CommonData;
+using FaTestSoft.FUNCTIONCLASS;
+
+namespace FaTestSoft
+{
+    public partial class ResetCmdViewForm : Form
+    {
+        public ResetCmdViewForm()
+        {
+            InitializeComponent();
+        }
+        private int ty = 0;
+        static byte index = 0;
+        private void ResetCmdViewForm_Load(object sender, EventArgs e)
+        {
+            //textBoxpassword.Text   = "ABCD";
+            radioreset.Enabled     = false;
+            radioinitparam.Enabled = false;
+            radiocleardata.Enabled = false;
+            radioclearpower.Enabled = false;
+
+        }
+        private void textBoxpassword_TextChanged(object sender, EventArgs e)
+        {
+            if (textBoxpassword.Text == "abcd")
+            {
+                radioreset.Enabled      = true;
+                radioinitparam.Enabled  = true;
+                radiocleardata.Enabled  = true;
+                radioclearpower.Enabled = true;
+            }
+        }
+
+        private void buttonexe_Click(object sender, EventArgs e)
+        {
+            if (PublicDataClass.LinSPointName == "无信息")
+            {
+                MessageBox.Show("无测量点信息可操作", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+
+            }
+            else
+            {
+                ty = PublicFunction.CheckPointOfCommunicationEntrace(PublicDataClass.LinSPointName);
+                if (ty == 0)
+                {
+                    MessageBox.Show("无测量点信息可操作", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+
+                }
+
+            }
+              //函数是这样用,比如100至999的随机数 
+            Random   ran=new   Random();
+            byte rand1 = 0, rand2 = 0;
+            //int   RandKey=ran.Next(1,255);    //不过这样会有重复,可以给Random一个系统时间做为参数，以此产生随机数，就不会重复了 
+            //System.Random a=new Random(System.DateTime.Now.Millisecond);
+            //int RandKey =a.Next(10);
+            PublicDataClass._DataField.FieldLen = 0;
+            rand1 =Convert.ToByte(ran.Next(1, 255));
+            rand2 =Convert.ToByte(ran.Next(1, 255));
+
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = rand1;     //随机数1
+            PublicDataClass._DataField.FieldLen++;
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = rand2;     //随机数2
+            PublicDataClass._DataField.FieldLen++;
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(rand1 | rand2); //或结果
+            PublicDataClass._DataField.FieldLen++;
+            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(rand1 & rand2); //与结果
+            PublicDataClass._DataField.FieldLen++;
+            if (index == 1)
+            {
+                if (ty == 1)
+                    PublicDataClass._ComTaskFlag.Reset_1 = true;
+
+                if (ty == 2)
+                    PublicDataClass._NetTaskFlag.Reset_1 = true;
+                if (ty == 3)
+                    PublicDataClass._GprsTaskFlag.Reset_1 = true;
+            }
+            else if (index ==2)
+            {
+                if (ty == 1)
+                    PublicDataClass._ComTaskFlag.SET_PARAM_CON = true;
+
+                if (ty == 2)
+                    PublicDataClass._NetTaskFlag.SET_PARAM_CON = true;
+                if (ty == 3)
+                    PublicDataClass._GprsTaskFlag.SET_PARAM_CON = true;
+                PublicDataClass.ParamInfoAddr = 0x5400;
+
+            }
+            else
+                return;
+        }
+
+        private void radioreset_CheckedChanged(object sender, EventArgs e)
+        {
+            index = 1;
+        }
+
+        private void radioinitparam_CheckedChanged(object sender, EventArgs e)
+        {
+            index = 2;
+        }
+    }
+}

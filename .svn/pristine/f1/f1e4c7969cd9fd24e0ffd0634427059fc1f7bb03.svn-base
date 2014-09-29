@@ -1,0 +1,2500 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using KD.WinFormsUI.Docking;
+using FaTestSoft.CommonData;
+using FaTestSoft.FUNCTIONCLASS;
+
+namespace FaTestSoft
+{
+    public partial class AcquisitionDocmentView : DockContent
+    {
+        public AcquisitionDocmentView()
+        {
+            InitializeComponent();
+        }
+        private Control[] Editors;
+        private Control[] Editors1;
+        private Control[] Editors2;
+        
+        [DllImport("DataConVert.dll")]
+             private static extern void InttoByte(int source, ref byte pdata);
+
+
+        [DllImport("Operateprotocol.dll")]
+        private static extern byte EncodeOneByte(byte BusNum, byte CardNum, byte UbusConnectionmode, byte IbusConnectionmode, ref byte pdata);
+        [DllImport("Operateprotocol.dll")]
+        private static extern byte EncodeThreeByte(int Index, byte Datatype, byte Magnification, ref byte pdata);
+
+        public bool ModifyFlag = false;
+        public static int dataPos = 0;
+        public static int Pos     = 0;
+        public int num            = 0;
+        public static byte ItemId = 0;
+        private int ty;
+        private int count = 0;
+
+        int[] IndexTable = new int[PublicDataClass._YcInformationParam.num / 4];
+        byte[] DatatypeTable = new byte[PublicDataClass._YcInformationParam.num / 4];
+        byte[] MagnificationTable = new byte[PublicDataClass._YcInformationParam.num / 4];
+
+        TabPage tp_dottable = new TabPage();//动态添加选项卡
+        public static StringBuilder temp = new StringBuilder(255);       //初始化 一个StringBuilder的类型
+        public static string str;
+        /// <summary>
+        /// ///////////////////////////////////////动态选项卡测试 /// ///////////////////////////////////////
+        /// </summary>
+
+        TabPage[] tp = new TabPage[50];//暂时开50个动态选项卡
+
+
+
+
+        /// ///////////////////////////////////////测试 /// ///////////////////////////////////////
+     
+
+        private void AcquisitionDocmentView_Load(object sender, EventArgs e)
+        {
+            Editors = new Control[] {
+	                                textBoxvalue,
+									textBoxvalue,			// for column 1
+                                    textBoxvalue,
+                                    comboBoxvalue1,           //
+									comboBoxvalue2,			// 
+                                                                  
+									};
+            Editors1 = new Control[] {
+	                                textBoxvalue,
+									textBoxvalue,			// for column 1
+                                    textBoxvalue,
+                                    textBoxvalue,           //
+									comboBoxvalue3,			// 
+                                    comboBoxvalue3,                              
+									};
+            Editors2 = new Control[] {
+	                                textBoxvalue,
+									textBoxvalue,			// for column 1
+                                    textBoxvalue,
+                                    textBoxvalue,           //					                        
+									};
+
+            comboBoxaddr.Items.Add("从板1");
+            comboBoxaddr.Items.Add("从板2");
+            comboBoxaddr.Items.Add("从板3");
+            comboBoxaddr.Items.Add("广 播");
+            comboBoxaddr.SelectedIndex = 3;
+            comboBoxaddr.Enabled = false;
+            
+            
+            if (PublicDataClass.SaveText.devicenum == 0)
+            {
+                comboBox1.Text = "无信息";
+
+            }
+            else
+            {
+                for (byte i = 0; i < PublicDataClass.SaveText.devicenum; i++)
+                {
+                    comboBox1.Items.Add(PublicDataClass.SaveText.Device[i].PointName);
+                }
+                comboBox1.Text = PublicDataClass.SaveText.Device[0].PointName;
+
+            }
+            num = PublicDataClass.SaveText.devicenum;
+
+
+            for (byte j = 0; j < PublicDataClass._YcParam.num/3; j++)
+            {
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                lv.SubItems.Add(PublicDataClass._YcParam.NameTable[j]);
+                lv.SubItems.Add(PublicDataClass._YcParam.ValueTable[j]);
+                lv.SubItems.Add(PublicDataClass._YcParam.ByteTable[j]);
+                listView1.Items.Add(lv);
+            }
+            tabPage1.Controls.Add(listView1);
+            ItemId = 1;  //默认的为1
+        }
+
+        private void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+            try
+            {
+                switch (e.TabPage.Name)
+                {
+                    case "tabPage1":                //
+                        ItemId = 1;
+                        downloadbutton.Enabled = true;
+                        comboBoxaddr.Items.Clear();
+                        comboBoxaddr.Items.Add("从板1");
+                        comboBoxaddr.Items.Add("从板2");
+                        comboBoxaddr.Items.Add("从板3");
+                        comboBoxaddr.Items.Add("广 播");
+                        comboBoxaddr.SelectedIndex = 3;
+                        tabPage1.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        CheckNowParamState();
+
+                        break;
+
+                    case "tabPage2":                //
+                        ItemId = 2;
+                        downloadbutton.Enabled = true;
+                        comboBoxaddr.Items.Clear();
+                        comboBoxaddr.Items.Add("主 板");
+                        comboBoxaddr.Items.Add("从板1");
+                        comboBoxaddr.Items.Add("从板2");
+                        comboBoxaddr.Items.Add("从板3");
+                        comboBoxaddr.Items.Add("广 播");
+                        comboBoxaddr.SelectedIndex = 0;
+                        tabPage2.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        CheckNowParamState();
+                        break;
+
+                    case "tabPage3":                //
+                        ItemId = 3;
+                        downloadbutton.Enabled = true;
+                        comboBoxaddr.Items.Clear();
+                        comboBoxaddr.Items.Add("主 板");
+                        comboBoxaddr.Items.Add("从板1");
+                        comboBoxaddr.Items.Add("从板2");
+                        comboBoxaddr.Items.Add("从板3");
+                        comboBoxaddr.Items.Add("广 播");
+                        comboBoxaddr.SelectedIndex = 0;
+                        tabPage3.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        CheckNowParamState();
+                        break;
+                    case "tabPage4":                //
+                        ItemId = 4;
+                        downloadbutton.Enabled = true;
+                        comboBoxaddr.Items.Clear();
+                        comboBoxaddr.Items.Add("主 板");
+
+                        comboBoxaddr.SelectedIndex = 0;
+                        tabPage4.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        CheckNowParamState();
+                        break;
+                    case "tabPage5":                //
+                        ItemId = 5;
+                        downloadbutton.Enabled = true;
+                        comboBoxaddr.Items.Clear();
+                        comboBoxaddr.Items.Add("主 板");
+
+                        comboBoxaddr.SelectedIndex = 0;
+                        tabPage5.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        CheckNowParamState();
+                        break;
+                    case "tabPage6":                //
+                        ItemId = 6;
+                        downloadbutton.Enabled = true;
+                        comboBoxaddr.Items.Clear();
+                        comboBoxaddr.Items.Add("从板1");
+                        comboBoxaddr.Items.Add("从板2");
+                        comboBoxaddr.Items.Add("从板3");
+                        comboBoxaddr.Items.Add("广 播");
+                        comboBoxaddr.SelectedIndex = 3;
+                        tabPage6.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        CheckNowParamState();
+                        break;
+                    case "tabPage7":                //
+                        ItemId = 7;
+                        downloadbutton.Enabled = true;
+                        tabPage7.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        CheckNowParamState();
+                        break;
+                    case "tabPage8":                //
+                        ItemId = 8;
+                        downloadbutton.Enabled = true;
+                        tabPage8.Controls.Clear();
+                        tabPage8.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        CheckNowParamState();
+                        break;
+                    case "tabPage9":                //
+                        ItemId = 9;
+                        downloadbutton.Enabled = false ;
+                        tabPage9.Controls.Add(listView2);
+                        listView2.Items.Clear();
+                        listView2.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        listView2.Controls.Add(comboBoxvalue3);
+                        comboBoxvalue3.Visible = false;
+                        CheckNowParamState();
+                        break;
+                    case "tabPage10":                //
+                        ItemId = 10;
+                        downloadbutton.Enabled = false ;
+                        tabPage10.Controls.Add(listView3);
+                        listView3.Items.Clear();
+                        listView3.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        listView3.Controls.Add(comboBoxvalue1);
+                        comboBoxvalue1.Visible = false;
+                        listView3.Controls.Add(comboBoxvalue2);
+                        comboBoxvalue1.Visible = false;
+                        CheckNowParamState();
+                        break;
+                    case "tabPage11":                //
+                        ItemId = 11;
+                        downloadbutton.Enabled = false ;
+                        comboBoxaddr.Items.Clear();
+                        comboBoxaddr.Items.Add("从板1");
+                        comboBoxaddr.Items.Add("从板2");
+                        comboBoxaddr.Items.Add("从板3");
+                        comboBoxaddr.Items.Add("广 播");
+                        comboBoxaddr.SelectedIndex = 3;
+               
+                        tabPage11.Controls.Add(listView1);
+                        listView1.Items.Clear();
+                        listView1.Controls.Add(textBoxvalue);
+                        textBoxvalue.Visible = false;
+                        CheckNowParamState();
+
+                        break;
+                    default:
+                        break;
+
+                }
+
+            }
+            catch
+            {
+
+
+            }
+            string str;
+            if (PublicDataClass.DynOptCfgFlag == 1)//动态选项卡已配置
+            {
+                for (int k = 0; k < PublicDataClass.FILENAME.Length; k++)
+                {
+                    downloadbutton.Enabled = true;
+                    str = String.Format("tp_{0:d}", k);
+                    if (e.TabPage.Name == str)
+                    {
+                        byte[] b = new byte[2];
+                        b[0] = (byte)k;
+                        ItemId = 0x14;
+                        ItemId += b[0];
+                        tp[k].Controls.Add(listViewtest);
+                        CheckNowDynOptParamState(k);//更新动态选项卡参数
+                    }
+
+                }
+            }
+        }
+
+        /********************************************************************************************
+       *  函数名：    CheckCfgState                                                                *
+       *  功能  ：    CheckNowParamState                                                           *
+       *  参数  ：    无                                                                           *
+       *  返回值：    无                                                                           *
+       *  修改日期：  2010-11-09                                                                   *
+       *  作者    ：  cuibj                                                                        *
+       * ******************************************************************************************/
+        private void CheckNowParamState()
+        {
+        
+            if (ItemId == 1)        //遥测参数
+            {
+
+                for (int j = 0; j < PublicDataClass._YcParam.num/3; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._YcParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcParam.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcParam.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+
+            }
+            else if (ItemId == 2) //遥信参数
+            {
+                for (int j = 0; j < PublicDataClass._YxParam.num/3; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._YxParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YxParam.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YxParam.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+            }
+            else if (ItemId == 3) //遥控参数
+            {
+                for (int j = 0; j < PublicDataClass._YkParam.num/3; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._YkParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YkParam.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YkParam.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+
+            }
+            else if (ItemId == 4) //遥信接入配置
+            {
+                for (int j = 0; j < PublicDataClass._YxLineCfgParam.num/3; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._YxLineCfgParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YxLineCfgParam.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YxLineCfgParam.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+
+            }
+            else if (ItemId == 5) //遥ce接入配置
+            {
+                for (int j = 0; j < PublicDataClass._YcLineCfgParam.num/3; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._YcLineCfgParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcLineCfgParam.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcLineCfgParam.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+
+            }
+            else if (ItemId == 6)
+            {
+                for (int j = 0; j < PublicDataClass._RaoDong.num / 3; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._RaoDong.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._RaoDong.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._RaoDong.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+            }
+            else if (ItemId == 7)
+            {
+                for (int j = 0; j < PublicDataClass._YkLogicInfo.num / 3; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._YkLogicInfo.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YkLogicInfo.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YkLogicInfo.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                }
+            }
+            else if (ItemId == 8)
+            {
+                int pos = 0; int index = 0;
+                for (int j = 0; j < PublicDataClass._Collector.num / 3; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", index));
+                    lv.SubItems.Add(PublicDataClass._Collector.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._Collector.ValueTable[j]);
+                    lv.SubItems.Add(PublicDataClass._Collector.ByteTable[j]);
+                    listView1.Items.Add(lv);
+                    index++;
+                }
+                for (int j = 0; j < PublicDataClass._Indicatorstruct.INDICATOR_Num *3; j++)
+                {
+                    if (j == pos * 3)
+                        pos++;
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", index));
+                    if (j == (pos * 3 - 3))
+                    {
+                        lv.SubItems.Add(PublicDataClass._Indicatorstruct.protocoltypeInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Indicatorstruct.protocoltypeInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Indicatorstruct.protocoltypeInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+
+                 
+                    else if (j == (pos * 3 - 2))
+                    {
+                        lv = new ListViewItem(String.Format("{0:d}", index));
+                      lv.SubItems.Add(PublicDataClass._Indicatorstruct.baudInfo[pos - 1].NameTable);
+                      lv.SubItems.Add(PublicDataClass._Indicatorstruct.baudInfo[pos - 1].ValueTable);
+                      lv.SubItems.Add(PublicDataClass._Indicatorstruct.baudInfo[pos - 1].ByteTable);
+                      listView1.Items.Add(lv);
+                    }
+
+                    
+                    else if (j == (pos * 3 - 1))
+                    {
+                        lv = new ListViewItem(String.Format("{0:d}", index));
+                        lv.SubItems.Add(PublicDataClass._Indicatorstruct.AddrInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Indicatorstruct.AddrInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Indicatorstruct.AddrInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+                    index++;
+
+                }
+                pos = 0;
+                for (int j = 0; j < PublicDataClass._Huijiqistruct.Huijiqi_Num * 3; j++)
+                {
+                    if (j == pos * 3)
+                        pos++;
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", index));
+                    if (j == (pos * 3 - 3))
+                    {
+                        lv.SubItems.Add(PublicDataClass._Huijiqistruct.protocoltypeInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Huijiqistruct.protocoltypeInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Huijiqistruct.protocoltypeInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+
+
+                    else if (j == (pos * 3 - 2))
+                    {
+                        lv = new ListViewItem(String.Format("{0:d}", index));
+                        lv.SubItems.Add(PublicDataClass._Huijiqistruct.baudInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Huijiqistruct.baudInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Huijiqistruct.baudInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+
+
+                    else if (j == (pos * 3 - 1))
+                    {
+                        lv = new ListViewItem(String.Format("{0:d}", index));
+                        lv.SubItems.Add(PublicDataClass._Huijiqistruct.AddrInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Huijiqistruct.AddrInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Huijiqistruct.AddrInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+                    index++;
+
+                }
+                pos = 0;
+                for (int j = 0; j < PublicDataClass._Sensorstruct.Sensor_Num * 3; j++)
+                {
+                    if (j == pos * 3)
+                        pos++;
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", index));
+                    if (j == (pos * 3 - 3))
+                    {
+                        lv.SubItems.Add(PublicDataClass._Sensorstruct.protocoltypeInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Sensorstruct.protocoltypeInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Sensorstruct.protocoltypeInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+
+
+                    else if (j == (pos * 3 - 2))
+                    {
+                        lv = new ListViewItem(String.Format("{0:d}", index));
+                        lv.SubItems.Add(PublicDataClass._Sensorstruct.baudInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Sensorstruct.baudInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Sensorstruct.baudInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+
+
+                    else if (j == (pos * 3 - 1))
+                    {
+                        lv = new ListViewItem(String.Format("{0:d}", index));
+                        lv.SubItems.Add(PublicDataClass._Sensorstruct.AddrInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Sensorstruct.AddrInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Sensorstruct.AddrInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+                    index++;
+
+                }
+                pos = 0;
+                for (int j = 0; j < PublicDataClass._Q2struct.Q2_Num * 3; j++)
+                {
+                    if (j == pos * 3)
+                        pos++;
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", index));
+                    if (j == (pos * 3 - 3))
+                    {
+                        lv.SubItems.Add(PublicDataClass._Q2struct.protocoltypeInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Q2struct.protocoltypeInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Q2struct.protocoltypeInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+
+
+                    else if (j == (pos * 3 - 2))
+                    {
+                        lv = new ListViewItem(String.Format("{0:d}", index));
+                        lv.SubItems.Add(PublicDataClass._Q2struct.baudInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Q2struct.baudInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Q2struct.baudInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+
+
+                    else if (j == (pos * 3 - 1))
+                    {
+                        lv = new ListViewItem(String.Format("{0:d}", index));
+                        lv.SubItems.Add(PublicDataClass._Q2struct.AddrInfo[pos - 1].NameTable);
+                        lv.SubItems.Add(PublicDataClass._Q2struct.AddrInfo[pos - 1].ValueTable);
+                        lv.SubItems.Add(PublicDataClass._Q2struct.AddrInfo[pos - 1].ByteTable);
+                        listView1.Items.Add(lv);
+                    }
+                    index++;
+
+                }
+
+
+            }
+            else if (ItemId == 9) //点号表配置
+            {
+                for (int j = 0; j < PublicDataClass._YcDotParam.num / 5; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._YcDotParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcDotParam.BusNumTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcDotParam.CardNumTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcDotParam.UBusConnectionmodeTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcDotParam.IBusConnectionmodeTable[j]);
+                    listView2.Items.Add(lv);
+                }
+
+            }
+            else if (ItemId == 10) //信息表配置
+            {
+                for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                    lv.SubItems.Add(PublicDataClass._YcInformationParam.NameTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcInformationParam.IndexTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcInformationParam.DatatypeTable[j]);
+                    lv.SubItems.Add(PublicDataClass._YcInformationParam.MagnificationTable[j]);
+                    listView3.Items.Add(lv);
+                }
+
+            }
+            else if (ItemId == 11) //遥信取反
+            {
+ 
+                for (int j = 0; j < PublicDataClass.ThreeYNameTable.Yxnum; j++)
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", j));
+                   
+                     lv.SubItems.Add(Convert.ToString(PublicDataClass.ThreeYNameTable.YxTable[j]));
+                     lv.SubItems.Add(PublicDataClass._YxDataQFParam.DataQFTable[j]);
+                     lv.SubItems.Add(PublicDataClass._YxDataQFParam.ByteTable[j]);
+                     
+                    listView1.Items.Add(lv);
+                }
+
+            }
+            //
+        }
+
+        private void AcquisitionDocmentView_Activated(object sender, EventArgs e)
+        {
+            if (PublicDataClass.DynOptCfgFlag == 1)
+                DynOptProcess();//动态添加选项卡
+            if (num == PublicDataClass.SaveText.devicenum)
+                return;
+            comboBox1.Items.Clear();
+            num = PublicDataClass.SaveText.devicenum;
+            if (PublicDataClass.SaveText.devicenum == 0)
+            {
+                comboBox1.Text = "无信息";
+
+            }
+            else
+            {
+                for (byte i = 0; i < PublicDataClass.SaveText.devicenum; i++)
+                {
+                    comboBox1.Items.Add(PublicDataClass.SaveText.Device[i].PointName);
+                }
+                comboBox1.Text = PublicDataClass.SaveText.Device[0].PointName;
+
+            }
+        }
+        /// <summary>
+        /// 添加菜单的 处理函数
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ItemId < 9 || ItemId == 11)
+            {
+                AddParamRecordViewForm AddPfm = new AddParamRecordViewForm();
+                AddPfm.ShowDialog();
+                if (AddPfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listView1.Items.Count));
+                    lv.SubItems.Add(PublicDataClass._AddParamRecord.Name);
+
+                    lv.SubItems.Add(PublicDataClass._AddParamRecord.Value);
+                    lv.SubItems.Add(PublicDataClass._AddParamRecord.Beilv);
+                    listView1.Items.Add(lv);
+                }
+            }
+            else if (ItemId == 9)
+            {
+                AddParamRecordViewForm1 AddPfm = new AddParamRecordViewForm1();
+                AddPfm.ShowDialog();
+                if (AddPfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listView2.Items.Count));
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.Name);
+
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.BusNum);
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.CardNum);
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.UBusConnectionmode);
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.IBusConnectionmode);
+                    listView2.Items.Add(lv);
+                    
+                }
+
+            }
+            else if (ItemId == 10)
+            {
+                AddParamRecordViewForm2 AddPfm = new AddParamRecordViewForm2();
+                AddPfm.ShowDialog();
+                if (AddPfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listView3.Items.Count));
+                    lv.SubItems.Add(PublicDataClass._AddYcInformationRecord.Name);
+                    lv.SubItems.Add(PublicDataClass._AddYcInformationRecord.Index);
+                    lv.SubItems.Add(PublicDataClass._AddYcInformationRecord.Datatype);
+                    lv.SubItems.Add(PublicDataClass._AddYcInformationRecord.Magnification);
+                    listView3.Items.Add(lv);
+
+                }
+
+            }
+            else if (ItemId - 0x14 >= 0)  //动态选项卡
+            {
+
+                ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listViewtest.Items.Count));
+                lv.SubItems.Add("");
+                lv.SubItems.Add("");
+                lv.SubItems.Add("");
+                listViewtest.Items.Add(lv);
+                RefreshParamState();
+            }
+
+        }
+
+        private void DeleteMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("确定要删除此项吗?", "信  息",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+                if (ItemId < 9 || ItemId == 11)
+                {
+                    ListView.SelectedListViewItemCollection SettleOnItem = new ListView.SelectedListViewItemCollection(this.listView1);
+
+                    if (SettleOnItem.Count <= 0)
+                    {
+                        MessageBox.Show("记录项选择为空", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    for (int i = 0; i < SettleOnItem.Count; )
+                    {
+
+                        listView1.Items.Remove(SettleOnItem[i]);       //删除所选择的项
+                    }
+                    for (int i = 0; i < listView1.Items.Count; i++)
+                    {
+                        listView1.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+
+                    }
+                    RefreshParamState();
+                }
+                else if(ItemId ==9)
+                {
+                    ListView.SelectedListViewItemCollection SettleOnItem = new ListView.SelectedListViewItemCollection(this.listView2);
+
+                    if (SettleOnItem.Count <= 0)
+                    {
+                        MessageBox.Show("记录项选择为空", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    for (int i = 0; i < SettleOnItem.Count; )
+                    {
+
+                        listView2.Items.Remove(SettleOnItem[i]);       //删除所选择的项
+                    }
+                    for (int i = 0; i < listView2.Items.Count; i++)
+                    {
+                        listView2.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+
+                    }
+                    RefreshParamState();
+                }
+                else if (ItemId == 10)
+                {
+                    ListView.SelectedListViewItemCollection SettleOnItem = new ListView.SelectedListViewItemCollection(this.listView3);
+
+                    if (SettleOnItem.Count <= 0)
+                    {
+                        MessageBox.Show("记录项选择为空", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    for (int i = 0; i < SettleOnItem.Count; )
+                    {
+
+                        listView3.Items.Remove(SettleOnItem[i]);       //删除所选择的项
+                    }
+                    for (int i = 0; i < listView3.Items.Count; i++)
+                    {
+                        listView3.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+
+                    }
+                    RefreshParamState();
+                }
+                else if (ItemId - 0x14 >= 0)  //动态选项卡
+                {
+
+                    ListView.SelectedListViewItemCollection SettleOnItem = new ListView.SelectedListViewItemCollection(this.listViewtest);
+
+                    if (SettleOnItem.Count <= 0)
+                    {
+                        MessageBox.Show("记录项选择为空", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    for (int i = 0; i < SettleOnItem.Count; )
+                    {
+
+                        listViewtest.Items.Remove(SettleOnItem[i]);       //删除所选择的项
+                    }
+                    for (int i = 0; i < listViewtest.Items.Count; i++)
+                    {
+                        listViewtest.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+                    }
+                    RefreshParamState();
+                }
+
+        }
+  
+        private void RefreshParamState()
+        {
+            if (ItemId == 1)
+            {
+                PublicDataClass._YcParam.num = listView1.Items.Count*3;
+                PublicDataClass._YcParam.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._YcParam.ValueTable= new string[listView1.Items.Count];
+                PublicDataClass._YcParam.ByteTable = new string[listView1.Items.Count];
+
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YcParam.NameTable[j]  = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._YcParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._YcParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+            else if (ItemId == 2)
+            {
+                PublicDataClass._YxParam.num = listView1.Items.Count*3;
+                PublicDataClass._YxParam.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._YxParam.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._YxParam.ByteTable = new string[listView1.Items.Count];
+
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YxParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._YxParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._YxParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+            else if (ItemId ==3)
+            {
+                PublicDataClass._YkParam.num = listView1.Items.Count*3;
+                PublicDataClass._YkParam.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._YkParam.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._YkParam.ByteTable = new string[listView1.Items.Count];
+
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YkParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._YkParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._YkParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+            else if (ItemId == 4)
+            {
+                PublicDataClass._YxLineCfgParam.num = listView1.Items.Count*3;
+                PublicDataClass._YxLineCfgParam.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._YxLineCfgParam.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._YxLineCfgParam.ByteTable = new string[listView1.Items.Count];
+
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YxLineCfgParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+
+                    PublicDataClass._YxLineCfgParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._YxLineCfgParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+            else if (ItemId == 5)
+            {
+                PublicDataClass._YcLineCfgParam.num = listView1.Items.Count*3;
+                PublicDataClass._YcLineCfgParam.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._YcLineCfgParam.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._YcLineCfgParam.ByteTable = new string[listView1.Items.Count];
+
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YcLineCfgParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._YcLineCfgParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._YcLineCfgParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+            else if (ItemId == 6)
+            {
+                PublicDataClass._RaoDong.num = listView1.Items.Count * 3;
+                PublicDataClass._RaoDong.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._RaoDong.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._RaoDong.ByteTable = new string[listView1.Items.Count];
+
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._RaoDong.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._RaoDong.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._RaoDong.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+            else if (ItemId == 7)
+            {
+                PublicDataClass._YkLogicInfo.num = listView1.Items.Count * 3;
+                PublicDataClass._YkLogicInfo.NameTable = new string[listView1.Items.Count];
+                PublicDataClass._YkLogicInfo.ValueTable = new string[listView1.Items.Count];
+                PublicDataClass._YkLogicInfo.ByteTable = new string[listView1.Items.Count];
+
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YkLogicInfo.NameTable[j] = listView1.Items[j].SubItems[1].Text;//取得listview某行某列的值
+
+                    PublicDataClass._YkLogicInfo.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._YkLogicInfo.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+
+            else if (ItemId == 9)
+            {
+                PublicDataClass._YcDotParam.num = listView2.Items.Count * 5;
+                PublicDataClass._YcDotParam.NameTable = new string[listView2.Items.Count];
+                PublicDataClass._YcDotParam.BusNumTable = new string[listView2.Items.Count];
+                PublicDataClass._YcDotParam.CardNumTable = new string[listView2.Items.Count];
+                PublicDataClass._YcDotParam.UBusConnectionmodeTable = new string[listView2.Items.Count];
+                PublicDataClass._YcDotParam.IBusConnectionmodeTable = new string[listView2.Items.Count];
+
+                for (int j = 0; j < listView2.Items.Count; j++)
+                {
+                    PublicDataClass._YcDotParam.NameTable[j] = listView2.Items[j].SubItems[1].Text;
+                    PublicDataClass._YcDotParam.BusNumTable[j] = listView2.Items[j].SubItems[2].Text;
+                    PublicDataClass._YcDotParam.CardNumTable[j] = listView2.Items[j].SubItems[3].Text;
+                    PublicDataClass._YcDotParam.UBusConnectionmodeTable[j] = listView2.Items[j].SubItems[4].Text;
+                    PublicDataClass._YcDotParam.IBusConnectionmodeTable[j] = listView2.Items[j].SubItems[5].Text;
+                }
+            }
+
+            else if (ItemId == 10)
+            {
+                PublicDataClass._YcInformationParam.num = listView3.Items.Count * 4;
+                PublicDataClass._YcInformationParam.NameTable = new string[listView3.Items.Count];
+                PublicDataClass._YcInformationParam.IndexTable = new string[listView3.Items.Count];
+                PublicDataClass._YcInformationParam.DatatypeTable = new string[listView3.Items.Count];
+                PublicDataClass._YcInformationParam.MagnificationTable = new string[listView3.Items.Count];
+
+                for (int j = 0; j < listView3.Items.Count; j++)
+                {
+                    PublicDataClass._YcInformationParam.NameTable[j] = listView3.Items[j].SubItems[1].Text;
+                    PublicDataClass._YcInformationParam.IndexTable[j] = listView3.Items[j].SubItems[2].Text;
+                    PublicDataClass._YcInformationParam.DatatypeTable[j] = listView3.Items[j].SubItems[3].Text;
+                    PublicDataClass._YcInformationParam.MagnificationTable[j] = listView3.Items[j].SubItems[4].Text;
+                }
+            }
+            else if (ItemId == 11)
+            {
+                PublicDataClass._YxDataQFParam.num = listView1.Items.Count * 2;
+             
+                PublicDataClass._YxDataQFParam.DataQFTable = new string[listView1.Items.Count];
+                PublicDataClass._YxDataQFParam.ByteTable = new string[listView1.Items.Count];
+
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+
+
+                    PublicDataClass._YxDataQFParam.DataQFTable[j] = listView1.Items[j].SubItems[2].Text;
+
+                    PublicDataClass._YxDataQFParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+            }
+            else if (ItemId - 0x14 >= 0)  //动态选项卡
+            {
+                PublicDataClass.TabCfg[ItemId - 0x14].LineNum = listViewtest.Items.Count;
+
+                for (int j = 0; j < PublicDataClass.TabCfg[ItemId - 0x14].ColumnNum; j++)
+                {
+
+                    PublicDataClass.TabCfg[ItemId - 0x14].TabPageValue[j].ValueTable = new string[PublicDataClass.TabCfg[ItemId - 0x14].LineNum];
+                    for (int q = 0; q < PublicDataClass.TabCfg[ItemId - 0x14].LineNum; q++)
+                    {
+                        PublicDataClass.TabCfg[ItemId - 0x14].TabPageValue[j].ValueTable[q] = listViewtest.Items[q].SubItems[j].Text;
+                    }
+                }
+
+            }
+
+        }
+
+
+
+
+
+
+        /// <summary>
+        /// 下载参数按钮的事件响应函数
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// 返回类型-void
+        private void downloadbutton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (comboBox1.Text == "无信息")
+                {
+                    MessageBox.Show("无测量点信息可操作", "信息",
+                       MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+
+                }
+                else
+                {
+                    ty = PublicFunction.CheckPointOfCommunicationEntrace(comboBox1.Text);
+                    if (ty == 0)
+                    {
+                        MessageBox.Show("无测量点信息可操作", "信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+
+                    }
+
+                }
+                PublicDataClass._DataField.FieldLen = 0;
+                PublicDataClass._DataField.FieldVSQ = 0;
+                if (ItemId == 1)  //下载遥测参数
+                {
+                    for (int i = 0; i < PublicDataClass._YcParam.num / 3; i++)
+                    {
+                        if (PublicDataClass._YcParam.ByteTable[i] == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._YcParam.ValueTable[i]);
+                            PublicDataClass._DataField.FieldLen++;
+
+                        }
+                        else if (PublicDataClass._YcParam.ByteTable[i] == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._YcParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                    }
+                    PublicDataClass.ParamInfoAddr = 0x7001;
+                }
+                else if (ItemId == 2) //遥信参数
+                {
+                    for (int i = 0; i < PublicDataClass._YxParam.num / 3; i++)
+                    {
+                        if (PublicDataClass._YxParam.ByteTable[i] == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._YxParam.ValueTable[i]);
+                            PublicDataClass._DataField.FieldLen++;
+
+                        }
+                        else if (PublicDataClass._YxParam.ByteTable[i] == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._YxParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                    }
+                    PublicDataClass.ParamInfoAddr = 0x8001;
+
+                }
+                else if (ItemId == 3)//遥控参数
+                {
+                    for (int i = 0; i < PublicDataClass._YkParam.num / 3; i++)
+                    {
+                        if (PublicDataClass._YkParam.ByteTable[i] == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._YkParam.ValueTable[i]);
+                            PublicDataClass._DataField.FieldLen++;
+
+                        }
+                        else if (PublicDataClass._YkParam.ByteTable[i] == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._YkParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                    }
+                    PublicDataClass.ParamInfoAddr = 0x9001;
+
+
+                }
+                else if (ItemId == 4) //遥信配置参数
+                {
+                    for (int i = 0; i < PublicDataClass._YxLineCfgParam.num / 3; i++)
+                    {
+                        if (PublicDataClass._YxLineCfgParam.ByteTable[i] == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._YxLineCfgParam.ValueTable[i]);
+                            PublicDataClass._DataField.FieldLen++;
+
+                        }
+                        else if (PublicDataClass._YxLineCfgParam.ByteTable[i] == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._YxLineCfgParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                    }
+                    PublicDataClass.ParamInfoAddr = 0xa001;
+
+                }
+                else if (ItemId == 5) //遥测配置参数
+                {
+                    dataPos = 0;
+                    count = 0;
+                    for (int i = 0; i < PublicDataClass._YcLineCfgParam.num / 3; i++)
+                    {
+
+                        count++;
+                        if (PublicDataClass._YcLineCfgParam.ByteTable[i] == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._YcLineCfgParam.ValueTable[i]);
+                            PublicDataClass._DataField.FieldLen++;
+
+                        }
+                        else if (PublicDataClass._YcLineCfgParam.ByteTable[i] == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._YcLineCfgParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+
+                        PublicDataClass._DataField.FieldVSQ++;
+                        if (PublicDataClass._DataField.FieldLen >= 240)       //一帧的长度
+                        {
+                            //StartMangFrameTransmit(ItemId);
+                            dataPos = i;
+                            Pos = 240;
+                            timer1.Enabled = true;
+                            break;
+
+                        }
+                    }
+                    PublicDataClass.ParamInfoAddr = 0xb001;
+                }
+                else if (ItemId == 6)  //遥测扰动
+                {
+                    for (int i = 0; i < PublicDataClass._RaoDong.num / 3; i++)
+                    {
+                        if (PublicDataClass._RaoDong.ByteTable[i] == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._RaoDong.ValueTable[i]);
+                            PublicDataClass._DataField.FieldLen++;
+
+                        }
+                        else if (PublicDataClass._RaoDong.ByteTable[i] == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._RaoDong.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        else if (PublicDataClass._RaoDong.ByteTable[i] == "4")
+                        {
+
+                            byte[] b = BitConverter.GetBytes(float.Parse(PublicDataClass._RaoDong.ValueTable[i]));
+
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = b[0];
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = b[1];
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 2] = b[2];
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 3] = b[3];
+
+
+                            //  InttoByte(Convert.ToInt16(PublicDataClass._RaoDong.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 4;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+
+                    }
+                    PublicDataClass.ParamInfoAddr = 0x5300;
+                }
+                else if (ItemId == 7)  //遥控逻辑
+                {
+                    for (int i = 0; i < PublicDataClass._YkLogicInfo.num / 3; i++)
+                    {
+                        if (PublicDataClass._YkLogicInfo.ByteTable[i] == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._YkLogicInfo.ValueTable[i]);
+                            PublicDataClass._DataField.FieldLen++;
+
+                        }
+                        else if (PublicDataClass._YkLogicInfo.ByteTable[i] == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._YkLogicInfo.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+
+                    }
+                    PublicDataClass.ParamInfoAddr = 0x5500;
+                }
+
+                else if (ItemId == 8)  //采集器参数
+                {
+                    //指示器
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicDataClass._Indicatorstruct.INDICATOR_Num;
+                    PublicDataClass._DataField.FieldLen++;
+                    for (int i = 0; i < PublicDataClass._Indicatorstruct.INDICATOR_Num; i++)
+                    {
+                        //协议
+                        if (PublicDataClass._Indicatorstruct.protocoltypeInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Indicatorstruct.protocoltypeInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Indicatorstruct.protocoltypeInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Indicatorstruct.protocoltypeInfo[i].ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                        //波特率
+
+                        if (PublicDataClass._Indicatorstruct.baudInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Indicatorstruct.baudInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Indicatorstruct.baudInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Indicatorstruct.baudInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                        //地址
+                        if (PublicDataClass._Indicatorstruct.AddrInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Indicatorstruct.AddrInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Indicatorstruct.AddrInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Indicatorstruct.AddrInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+
+                    }
+                    //汇集器
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicDataClass._Huijiqistruct.Huijiqi_Num;
+                    PublicDataClass._DataField.FieldLen++;
+                    for (int i = 0; i < PublicDataClass._Huijiqistruct.Huijiqi_Num; i++)
+                    {
+                        //协议
+                        if (PublicDataClass._Huijiqistruct.protocoltypeInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Huijiqistruct.protocoltypeInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Huijiqistruct.protocoltypeInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Huijiqistruct.protocoltypeInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                        //波特率
+
+                        if (PublicDataClass._Huijiqistruct.baudInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Huijiqistruct.baudInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Huijiqistruct.baudInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Huijiqistruct.baudInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                        //地址
+                        if (PublicDataClass._Huijiqistruct.AddrInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Huijiqistruct.AddrInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Huijiqistruct.AddrInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Huijiqistruct.AddrInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+
+
+                    }
+
+                    //传感器
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicDataClass._Sensorstruct.Sensor_Num;
+                    PublicDataClass._DataField.FieldLen++;
+                    for (int i = 0; i < PublicDataClass._Sensorstruct.Sensor_Num; i++)
+                    {
+                        //协议
+                        if (PublicDataClass._Sensorstruct.protocoltypeInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Sensorstruct.protocoltypeInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Sensorstruct.protocoltypeInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Sensorstruct.protocoltypeInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                        //波特率
+
+                        if (PublicDataClass._Sensorstruct.baudInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Sensorstruct.baudInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Sensorstruct.baudInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Sensorstruct.baudInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                        //地址
+                        if (PublicDataClass._Sensorstruct.AddrInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Sensorstruct.AddrInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Sensorstruct.AddrInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Sensorstruct.AddrInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+
+
+                    }
+                    //Q3
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicDataClass._Q2struct.Q2_Num;
+                    PublicDataClass._DataField.FieldLen++;
+                    for (int i = 0; i < PublicDataClass._Q2struct.Q2_Num; i++)
+                    {
+                        //协议
+                        if (PublicDataClass._Q2struct.protocoltypeInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Q2struct.protocoltypeInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Q2struct.protocoltypeInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Q2struct.protocoltypeInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                        //波特率
+
+                        if (PublicDataClass._Q2struct.baudInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Q2struct.baudInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Q2struct.baudInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Q2struct.baudInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                        //地址
+                        if (PublicDataClass._Q2struct.AddrInfo[i].ByteTable == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._Q2struct.AddrInfo[i].ValueTable);
+                            PublicDataClass._DataField.FieldLen++;
+                        }
+                        else if (PublicDataClass._Q2struct.AddrInfo[i].ByteTable == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._Q2struct.AddrInfo[i].ValueTable), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+
+
+                    }
+
+                    PublicDataClass.ParamInfoAddr = 0x5600;
+                }
+                else if (ItemId == 9) //遥测点号表
+                {
+                    dataPos = 0;
+                    count = 0;
+                    byte[] p1 = new byte[1];
+                    byte BusNumTable, CardNumTable, UBusConnectionmodeTable = 0, IBusConnectionmodeTable = 0;
+
+                    for (int i = 0; i < PublicDataClass._YcDotParam.num / 3; i++)
+                    {
+                        count++;
+                        BusNumTable = Convert.ToByte(PublicDataClass._YcDotParam.BusNumTable[i]);
+                        CardNumTable = Convert.ToByte(PublicDataClass._YcDotParam.CardNumTable[i]);
+                        if (PublicDataClass._YcDotParam.UBusConnectionmodeTable[i] == "Y型")
+                            UBusConnectionmodeTable = 0;
+                        if (PublicDataClass._YcDotParam.UBusConnectionmodeTable[i] == "V型")
+                            UBusConnectionmodeTable = 1;
+                        if (PublicDataClass._YcDotParam.IBusConnectionmodeTable[i] == "Y型")
+                            IBusConnectionmodeTable = 0;
+                        if (PublicDataClass._YcDotParam.IBusConnectionmodeTable[i] == "V型")
+                            IBusConnectionmodeTable = 1;
+
+                        EncodeOneByte(BusNumTable, CardNumTable, UBusConnectionmodeTable, IBusConnectionmodeTable, ref p1[0]);
+
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = p1[0];
+                        PublicDataClass._DataField.FieldLen++;
+
+                        PublicDataClass._DataField.FieldVSQ++;
+                        if (PublicDataClass._DataField.FieldLen >= 240)       //一帧的长度
+                        {
+                            //StartMangFrameTransmit(ItemId);
+                            dataPos = i;
+                            Pos = 240;
+                            timer1.Enabled = true;
+                            break;
+
+                        }
+                    }
+                    PublicDataClass.ParamInfoAddr = 0xb001;//待定
+                }
+
+                else if (ItemId == 10) //遥测信息表     //zxl
+                {
+                    dataPos = 0;
+                    count = 0;
+                    byte[] p2 = new byte[3];
+                    //byte DatatypeTable=0, MagnificationTable=0;
+
+                    //int[] IndexTable = new int[PublicDataClass._YcInformationParam.num / 4];
+                    //byte[] DatatypeTable = new byte[PublicDataClass._YcInformationParam.num / 4];
+                    //byte[] MagnificationTable = new byte[PublicDataClass._YcInformationParam.num / 4];
+
+                    for (int i = 0; i < PublicDataClass._YcInformationParam.num / 4; i++)
+                    {
+
+                        IndexTable[i] = Convert.ToInt16(PublicDataClass._YcInformationParam.IndexTable[i]);
+                        if (PublicDataClass._YcInformationParam.DatatypeTable[i] == "整型")
+                            DatatypeTable[i] = 0;
+                        else if (PublicDataClass._YcInformationParam.DatatypeTable[i] == "浮点型")
+                            DatatypeTable[i] = 1;
+                        //  MagnificationTable = Convert.ToByte(PublicDataClass._YcInformationParam.MagnificationTable[i]);
+                        if (PublicDataClass._YcInformationParam.MagnificationTable[i] == "不放大")
+                            MagnificationTable[i] = 0;
+                        else if (PublicDataClass._YcInformationParam.MagnificationTable[i] == "10倍")
+                            MagnificationTable[i] = 1;
+                        else if (PublicDataClass._YcInformationParam.MagnificationTable[i] == "100倍")
+                            MagnificationTable[i] = 2;
+                        else if (PublicDataClass._YcInformationParam.MagnificationTable[i] == "1000倍")
+                            MagnificationTable[i] = 3;
+                    }
+
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte((0x4001) % 256);
+                    PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = Convert.ToByte((0x4001) / 256);
+                    PublicDataClass._DataField.FieldLen += 2;
+                    for (int i = 0; i < PublicDataClass._YcInformationParam.num / 4; i++)
+                    {
+                        for (int j = 0; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                        {
+                            if (IndexTable[j] == i)
+                            {
+                                EncodeThreeByte(IndexTable[j], DatatypeTable[j], MagnificationTable[j], ref p2[0]);
+
+                                count++;
+
+                                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = p2[0];
+                                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = p2[1];
+                                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 2] = p2[2];
+                                PublicDataClass._DataField.FieldLen += 3;
+
+
+                                PublicDataClass._DataField.FieldVSQ++;
+                                break;
+                            }
+                        }
+
+                        if (PublicDataClass._DataField.FieldLen >= 238)       //一帧的长度
+                        {
+                            //StartMangFrameTransmit(ItemId);
+                            dataPos = i;
+                            Pos = 240;
+                            timer1.Enabled = true;
+                            break;
+
+                        }
+                    }
+                    PublicDataClass.ParamInfoAddr = 0xF001;//待定
+                }
+                else if (ItemId == 11)  //下载遥信取反
+                {
+                    for (int i = 0; i < PublicDataClass._YxDataQFParam.num / 2; i++)
+                    {
+                        if (PublicDataClass._YxDataQFParam.ByteTable[i] == "1")
+                        {
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._YxDataQFParam.DataQFTable[i]);
+                            PublicDataClass._DataField.FieldLen++;
+
+                        }
+                        else if (PublicDataClass._YxDataQFParam.ByteTable[i] == "2")
+                        {
+                            InttoByte(Convert.ToInt16(PublicDataClass._YxDataQFParam.DataQFTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                            PublicDataClass._DataField.FieldLen += 2;
+                        }
+                        PublicDataClass._DataField.FieldVSQ++;
+                        if (PublicDataClass._DataField.FieldLen >= 240)       //一帧的长度
+                        {
+                            //StartMangFrameTransmit(ItemId);
+                            dataPos = i;
+                            Pos = 240;
+                            timer1.Enabled = true;
+                            break;
+
+                        }
+                    }
+                    PublicDataClass.ParamInfoAddr = 0xf301;//待定
+                }
+                else if (ItemId - 0x14 >= 0)  //动态选项卡
+                {
+                    //if (PublicDataClass.TabCfg[ItemId - 0x14].ColumnPageName == "软压板")
+                    //{
+                    //}
+                    //else
+                    //{
+
+
+                        for (int q = 0; q < PublicDataClass.TabCfg[ItemId - 0x14].LineNum; q++)
+                        {
+
+                            if (PublicDataClass.TabCfg[ItemId - 0x14].TabPageValue[3].ValueTable[q] == "1")
+                            {
+                                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass.TabCfg[ItemId - 0x14].TabPageValue[2].ValueTable[q]);
+                                PublicDataClass._DataField.FieldLen++;
+
+                            }
+                            else if (PublicDataClass.TabCfg[ItemId - 0x14].TabPageValue[3].ValueTable[q] == "2")
+                            {
+                                InttoByte(Convert.ToInt16(PublicDataClass.TabCfg[ItemId - 0x14].TabPageValue[2].ValueTable[q]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                                PublicDataClass._DataField.FieldLen += 2;
+                            }
+                            else if (PublicDataClass.TabCfg[ItemId - 0x14].TabPageValue[3].ValueTable[q] == "4")
+                            {
+
+                                byte[] b = BitConverter.GetBytes(float.Parse(PublicDataClass.TabCfg[ItemId - 0x14].TabPageValue[2].ValueTable[q]));
+
+                                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = b[0];
+                                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = b[1];
+                                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 2] = b[2];
+                                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 3] = b[3];
+
+
+                                //  InttoByte(Convert.ToInt16(PublicDataClass._RaoDong.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                                PublicDataClass._DataField.FieldLen += 4;
+                            }
+                            PublicDataClass._DataField.FieldVSQ++;
+                            //if (PublicDataClass._DataField.FieldLen >= 240)       //一帧的长度
+                            //{
+                            //    //StartMangFrameTransmit(ItemId);
+                            //    dataPos = i;
+                            //    Pos = 240;
+                            //    timer1.Enabled = true;
+                            //    break;
+
+                            //}
+                        }
+                        PublicDataClass.ParamInfoAddr = PublicDataClass.TabCfg[ItemId - 0x14].DownAddr;//待定
+
+                    }
+
+                    if (ty == 1)
+                        PublicDataClass._ComTaskFlag.SET_PARAM_CON = true;
+
+                    if (ty == 2)
+                        PublicDataClass._NetTaskFlag.SET_PARAM_CON = true;
+                    if (ty == 3)
+                        PublicDataClass._GprsTaskFlag.SET_PARAM_CON = true;
+                //}
+            }
+            catch (OverflowException ee)                  //溢出异常 
+            {
+
+                MessageBox.Show(ee.Message, "信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+
+            }
+            catch (FormatException ee)                  //溢出异常 
+            {
+
+                MessageBox.Show(ee.Message, "信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+
+            }
+        }
+        /// <summary>
+        /// 按键--按下的处理事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void textBoxvalue_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (ItemId < 4)
+            {
+
+                if (e.KeyChar != '\b')//这是允许输入退格键
+                {
+                    if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                    {
+
+                        MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        //listView1.RemoveEmbeddedControl(tbox);
+                        e.Handled = true;
+                    }
+                }
+            }
+            else if(ItemId ==5)
+            {
+                if (e.KeyChar != '\b')//这是允许输入退格键
+                {
+                    if (ModifyFlag == true)
+                    {
+                        if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                        {
+
+                            MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            //listView1.RemoveEmbeddedControl(tbox);
+                            e.Handled = true;
+                        }
+
+                    }
+                    /*else
+                    {
+
+                        if ((e.KeyChar != '0') && (e.KeyChar != '1'))//这是允许输入0-1数字
+                        {
+
+                            MessageBox.Show("只能输入0或1！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            //listView1.RemoveEmbeddedControl(tbox);
+                            e.Handled = true;
+
+                        }
+                    }*/
+                }
+            }
+
+
+            else if (ItemId == 9)
+            {
+
+                if (e.KeyChar != '\b')//这是允许输入退格键
+                {
+                    if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                    {
+
+                        MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        //listView1.RemoveEmbeddedControl(tbox);
+                        e.Handled = true;
+                    }
+                }
+            }
+
+            else if (ItemId == 10)
+            {
+
+                if (e.KeyChar != '\b')//这是允许输入退格键
+                {
+                    if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                    {
+
+                        MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        //listView1.RemoveEmbeddedControl(tbox);
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+        private void listView1_SubItemClicked(object sender, SubItemEventArgs e)
+        {
+            if (this.listView1.SelectedItems.Count == 0)
+                return;
+            if ((e.SubItem < 2) || e.SubItem == 3) // Password field
+            {
+                // the current value (text) of the subitem is ****, so we have to provide
+                // the control with the actual text (that's been saved in the item's Tag property)
+                return;
+            }
+            if (ItemId < 4)
+                listView1.StartEditing(Editors[e.SubItem], e.Item, e.SubItem);
+            else
+            {
+                //if (Convert.ToInt16(this.listView1.SelectedItems[0].SubItems[2].Text) > 1)
+                //    ModifyFlag = true;
+                //else
+                  //ModifyFlag = false;
+                listView1.StartEditing(Editors[e.SubItem], e.Item, e.SubItem);
+            }
+        }
+
+
+        /// <summary>
+        /// listview的鼠标单击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void listView1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.listView1.SelectedItems.Count == 0)
+                return;
+            foreach (ListViewItem item in this.listView1.Items)
+            {
+                item.ForeColor = SystemColors.WindowText;
+
+            }
+            this.listView1.SelectedItems[0].ForeColor = Color.Red;//设置当前选择项为红色
+        }
+        /// <summary>
+        /// textbox离开事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void textBoxvalue_Leave(object sender, EventArgs e)
+        {   
+            listView1.EndEditing(true);
+            listView2.EndEditing(true);
+            listView3.EndEditing(true);
+            listViewtest.EndEditing(true);
+            RefreshParamState();
+        }
+        /// <summary>
+        /// 多帧传送
+        /// </summary>
+        /// <param name="mid"></param>
+        private void StartMangFrameTransmit(byte mid)     //等待应答后再发
+        {
+
+            if (mid == 1)
+            {
+
+            }
+            else if (mid == 5 || mid ==11)
+            {
+                PublicDataClass._DataField.FieldLen = 0;
+                PublicDataClass._DataField.FieldVSQ = 0;
+                PublicDataClass.ParamInfoAddr += Pos;
+                for (int i = dataPos+1; i < PublicDataClass._YcLineCfgParam.num/3; i++)
+                {
+                    count++;
+                    if (PublicDataClass._YcLineCfgParam.ByteTable[i] == "1")
+                    {
+                        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte(PublicDataClass._YcLineCfgParam.ValueTable[i]);
+                        if (count >= 688 && count <= 705)
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen];
+                        PublicDataClass._DataField.FieldLen++;
+
+                    }
+                    else if (PublicDataClass._YcLineCfgParam.ByteTable[i] == "2")
+                    {
+                        InttoByte(Convert.ToInt16(PublicDataClass._YcLineCfgParam.ValueTable[i]), ref PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen]);
+                        PublicDataClass._DataField.FieldLen += 2;
+                    }
+                    PublicDataClass._DataField.FieldVSQ++;
+                    if (PublicDataClass._DataField.FieldLen >=240)       //一帧的长度
+                    {
+                        //StartMangFrameTransmit(ItemId);
+                        dataPos = 0;
+                        dataPos = i;
+                        Pos     = 240;
+                        timer1.Enabled = true;
+                        break;
+
+                    }
+                }
+                
+            }
+            else if (mid == 10) //遥测信息表
+            //{                                       //===========================================删
+            //    PublicDataClass._DataField.FieldLen = 0;
+            //    PublicDataClass._DataField.FieldVSQ = 0;
+            //    PublicDataClass.ParamInfoAddr += Pos;
+            //    byte[] p2 = new byte[3];
+            //    byte DatatypeTable, MagnificationTable;
+            //    int IndexTable;
+            //    for (int i = dataPos + 1; i < PublicDataClass._YcInformationParam.num / 4; i++)
+            //    {
+            //        count++;
+            //        IndexTable = Convert.ToInt16(PublicDataClass._YcInformationParam.IndexTable[i]);
+            //        DatatypeTable = Convert.ToByte(PublicDataClass._YcInformationParam.DatatypeTable[i]);
+            //        MagnificationTable = Convert.ToByte(PublicDataClass._YcInformationParam.MagnificationTable[i]);
+            //        /* if (PublicDataClass._YcInformationParam.MagnificationTable[i]== "不放大")
+            //            MagnificationTable= 0;
+            //         else if (PublicDataClass._YcInformationParam.MagnificationTable[i]== "10倍")
+            //            MagnificationTable= 1;
+            //         else  if (PublicDataClass._YcInformationParam.MagnificationTable[i]== "100倍")
+            //            MagnificationTable= 2;
+            //         else  if (PublicDataClass._YcInformationParam.MagnificationTable[i]== "1000倍")
+            //             MagnificationTable= 3;*/
+
+            //        EncodeThreeByte(IndexTable, DatatypeTable, MagnificationTable, ref p2[0]);
+
+
+            //        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = p2[0];
+            //        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = p2[1];
+            //        PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 2] = p2[2];
+            //        PublicDataClass._DataField.FieldLen += 3;
+
+
+            //        PublicDataClass._DataField.FieldVSQ++;
+            //        if (PublicDataClass._DataField.FieldLen >= 240)       //一帧的长度
+            //        {
+            //            //StartMangFrameTransmit(ItemId);
+            //            dataPos = i;
+            //            Pos = 240;
+            //            timer1.Enabled = true;
+            //            break;
+
+            //        }
+            //    }
+
+            //}    //===========================================删
+            //===========================================
+            {
+                PublicDataClass._DataField.FieldLen = 0;
+                PublicDataClass._DataField.FieldVSQ = 0;
+                //PublicDataClass.ParamInfoAddr = 0x4001 + dataPos;
+                byte[] p2 = new byte[3];
+
+                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen] = Convert.ToByte((0x4001 + dataPos ) % 256);
+                PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = Convert.ToByte((0x4001 + dataPos ) / 256);
+                PublicDataClass._DataField.FieldLen += 2;
+                //for (int i = dataPos + 1; i < PublicDataClass._YcInformationParam.num / 4; i++)
+                //{
+                //    count++;
+                //    IndexTable[i] = Convert.ToInt16(PublicDataClass._YcInformationParam.IndexTable[i]);
+                //    if (PublicDataClass._YcInformationParam.DatatypeTable[i] == "整型")
+                //        DatatypeTable[i] = 0;
+                //    else if (PublicDataClass._YcInformationParam.DatatypeTable[i] == "浮点型")
+                //        DatatypeTable[i] = 1;
+                //    //  MagnificationTable = Convert.ToByte(PublicDataClass._YcInformationParam.MagnificationTable[i]);
+                //    if (PublicDataClass._YcInformationParam.MagnificationTable[i] == "不放大")
+                //        MagnificationTable[i] = 0;
+                //    else if (PublicDataClass._YcInformationParam.MagnificationTable[i] == "10倍")
+                //        MagnificationTable[i] = 1;
+                //    else if (PublicDataClass._YcInformationParam.MagnificationTable[i] == "100倍")
+                //        MagnificationTable[i] = 2;
+                //    else if (PublicDataClass._YcInformationParam.MagnificationTable[i] == "1000倍")
+                //        MagnificationTable[i] = 3;
+                //}
+                for (int i = dataPos + 1; i < PublicDataClass._YcInformationParam.num / 4; i++)
+                {
+                    for (int j = dataPos + 1; j < PublicDataClass._YcInformationParam.num / 4; j++)
+                    {
+                        if (IndexTable[j] == i)
+                        {
+                            EncodeThreeByte(IndexTable[j], DatatypeTable[j], MagnificationTable[j], ref p2[0]);
+
+                            count++;
+                            
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 0] = p2[0];
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 1] = p2[1];
+                            PublicDataClass._DataField.Buffer[PublicDataClass._DataField.FieldLen + 2] = p2[2];
+                            PublicDataClass._DataField.FieldLen += 3;
+
+
+                            PublicDataClass._DataField.FieldVSQ++;
+                            break;
+                        }
+                    }
+                    if (PublicDataClass._DataField.FieldLen >= 238)       //一帧的长度
+                    {
+                        //StartMangFrameTransmit(ItemId);
+                        dataPos = i;
+                        Pos = 240;
+                        timer1.Enabled = true;
+                        break;
+
+                    }
+                }
+                PublicDataClass.ParamInfoAddr = 0xF001;//待定
+            }
+
+                //============================================================
+
+            if (ty == 1)
+                PublicDataClass._ComTaskFlag.SET_PARAM_CON = true;
+
+            if (ty == 2)
+                PublicDataClass._NetTaskFlag.SET_PARAM_CON = true;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (PublicDataClass._Message.ParamAck == true)
+            {
+                PublicDataClass._Message.ParamAck = false;
+                timer1.Enabled = false;
+                StartMangFrameTransmit(ItemId);
+               
+            }
+        }
+        /// <summary>
+        /// 保存--按钮的处理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void buttonsave_Click(object sender, EventArgs e)
+        {
+            string FileName = "";
+            //string path  =Application.ExecutablePath;
+            string path =System.AppDomain.CurrentDomain.BaseDirectory;
+            //string path = System.IO.Directory.GetCurrentDirectory();
+            //string path = System.Environment.CurrentDirectory;
+            path += "ini";
+
+            if (ItemId == 1)   //遥测参数
+            {
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                  
+                    PublicDataClass._YcParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;
+                    PublicDataClass._YcParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+                    PublicDataClass._YcParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                }
+                FileName = path + "\\ycparam.ini";
+                PublicDataClass._YcParam.num = listView1.Items.Count * 3;
+
+                WriteReadAllFile.WriteReadYxYkYmIniFile(FileName, 1, 7);
+
+            }
+            else if (ItemId == 2)  //遥信参数
+            {
+                
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YxParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;
+                    PublicDataClass._YxParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+                    PublicDataClass._YxParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+
+                }
+
+                FileName = path + "\\yxparam.ini";
+                PublicDataClass._YxParam.num = listView1.Items.Count * 3;
+
+                WriteReadAllFile.WriteReadYxYkYmIniFile(FileName, 1, 8);
+
+            }
+            else if (ItemId == 3)  //遥控参数
+            {
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YkParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;
+                    PublicDataClass._YkParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+                    PublicDataClass._YkParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+
+                }
+
+                FileName = path + "\\ykparam.ini";
+                PublicDataClass._YkParam.num = listView1.Items.Count * 3;
+
+                WriteReadAllFile.WriteReadYxYkYmIniFile(FileName, 1, 9);
+
+
+            }
+            else if (ItemId == 4)  //遥信接入配置参数
+            {
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YxLineCfgParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;
+                    PublicDataClass._YxLineCfgParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+                    PublicDataClass._YxLineCfgParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+
+                }
+
+                FileName = path + "\\yxlinecfgparam.ini";
+                PublicDataClass._YxLineCfgParam.num = listView1.Items.Count * 3;
+
+                WriteReadAllFile.WriteReadYxYkYmIniFile(FileName, 1, 10);
+
+
+            }
+            else if (ItemId == 5)  //遥测接入配置参数
+            {
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YcLineCfgParam.NameTable[j] = listView1.Items[j].SubItems[1].Text;
+                    PublicDataClass._YcLineCfgParam.ValueTable[j] = listView1.Items[j].SubItems[2].Text;
+                    PublicDataClass._YcLineCfgParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+
+                }
+
+                FileName = path + "\\yclinecfgparam.ini";
+                PublicDataClass._YcLineCfgParam.num = listView1.Items.Count * 3;
+
+                WriteReadAllFile.WriteReadYxYkYmIniFile(FileName, 1, 11);
+            }
+            else if (ItemId == 9)  //遥测信息表配置参数
+            {
+               
+                for (int j = 0; j < listView2.Items.Count; j++)
+                {
+                    PublicDataClass._YcDotParam.NameTable[j] = listView2.Items[j].SubItems[1].Text;
+                    PublicDataClass._YcDotParam.BusNumTable[j] = listView2.Items[j].SubItems[2].Text;
+                    PublicDataClass._YcDotParam.CardNumTable[j] = listView2.Items[j].SubItems[3].Text;
+                    PublicDataClass._YcDotParam.UBusConnectionmodeTable[j] = listView2.Items[j].SubItems[4].Text;
+                    PublicDataClass._YcDotParam.IBusConnectionmodeTable[j] = listView2.Items[j].SubItems[5].Text;
+                }
+
+                FileName = path + "\\YcDotParam.ini";
+                PublicDataClass._YcInformationParam.num = listView2.Items.Count * 5;
+
+                WriteReadAllFile.WriteReadYxYkYmIniFile(FileName, 1, 18);
+            }
+            else if (ItemId == 10)  //遥测信息表配置参数
+            {
+                for (int j = 0; j < listView3.Items.Count; j++)
+                {
+                    PublicDataClass._YcInformationParam.NameTable[j] = listView3.Items[j].SubItems[1].Text;
+                    PublicDataClass._YcInformationParam.IndexTable[j] = listView3.Items[j].SubItems[2].Text;
+                    PublicDataClass._YcInformationParam.DatatypeTable[j] = listView3.Items[j].SubItems[3].Text;
+                    PublicDataClass._YcInformationParam.MagnificationTable[j] = listView3.Items[j].SubItems[4].Text;
+                }
+
+                FileName = path + "\\YcInformationParam.ini";
+                PublicDataClass._YcInformationParam.num = listView3.Items.Count * 4;
+
+                WriteReadAllFile.WriteReadYxYkYmIniFile(FileName, 1, 19);
+            }
+            else if (ItemId == 11)  //遥信取反
+            {
+                for (int j = 0; j < listView1.Items.Count; j++)
+                {
+                    PublicDataClass._YxDataQFParam.DataQFTable[j] = listView1.Items[j].SubItems[2].Text;
+                    PublicDataClass._YxDataQFParam.ByteTable[j] = listView1.Items[j].SubItems[3].Text;
+                   
+                }
+
+                FileName = path + "\\yxdateqf.ini";
+                PublicDataClass._YxDataQFParam.num = listView1.Items.Count*2;
+
+                WriteReadAllFile.WriteReadYxYkYmIniFile(FileName, 1, 20);
+            }
+            else if (ItemId - 0x14 >= 0)  //动态选项卡
+            {
+                PublicDataClass.TabCfg[ItemId - 0x14].LineNum = listViewtest.Items.Count;
+
+                WriteReadAllFile.ReadDynOptFile(PublicDataClass.FILENAME[ItemId - 0x14], ItemId - 0x14, 2);
+
+            }
+
+
+            MessageBox.Show("保存成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void InsertMenuItem_Click(object sender, EventArgs e)
+        {
+           if (ItemId < 9 || ItemId == 11)
+            {
+                AddParamRecordViewForm AddPfm = new AddParamRecordViewForm();
+                AddPfm.ShowDialog();
+                if (AddPfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listView1.SelectedItems[0].Index));
+                    lv.SubItems.Add(PublicDataClass._AddParamRecord.Name);
+
+                    lv.SubItems.Add(PublicDataClass._AddParamRecord.Value);
+                    lv.SubItems.Add(PublicDataClass._AddParamRecord.Beilv);
+                    listView1.Items.Insert(this.listView1.SelectedItems[0].Index, lv);
+                    for (int i = 0; i < listView1.Items.Count; i++)
+                    {
+                        listView1.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+
+                    }
+                    RefreshParamState();
+                }
+            }
+            else if (ItemId == 9)
+            {
+                AddParamRecordViewForm1 AddPfm = new AddParamRecordViewForm1();
+                AddPfm.ShowDialog();
+                if (AddPfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listView2.SelectedItems[0].Index));
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.Name);
+
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.BusNum);
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.CardNum);
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.UBusConnectionmode);
+                    lv.SubItems.Add(PublicDataClass._AddYcDotParamRecord.IBusConnectionmode);
+                    listView2.Items.Insert(this.listView2.SelectedItems[0].Index, lv);
+                    for (int i = 0; i < listView2.Items.Count; i++)
+                    {
+                        listView2.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+
+                    }
+                    RefreshParamState();
+                }
+            }
+            else if (ItemId == 10)
+            {
+                AddParamRecordViewForm2 AddPfm = new AddParamRecordViewForm2();
+                AddPfm.ShowDialog();
+                if (AddPfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+                {
+                    ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listView3.SelectedItems[0].Index));
+                   
+                    lv.SubItems.Add(PublicDataClass._AddYcInformationRecord.Name);
+                    lv.SubItems.Add(PublicDataClass._AddYcInformationRecord.Index);
+                    lv.SubItems.Add(PublicDataClass._AddYcInformationRecord.Datatype);
+                    lv.SubItems.Add(PublicDataClass._AddYcInformationRecord.Magnification);
+                    
+                    listView3.Items.Insert(this.listView3.SelectedItems[0].Index, lv);
+                    for (int i = 0; i < listView3.Items.Count; i++)
+                    {
+                        listView3.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+
+                    }
+                    RefreshParamState();
+                }
+            }
+           else if (ItemId - 0x14 >= 0)  //动态选项卡
+           {
+
+               ListViewItem lv = new ListViewItem(String.Format("{0:d}", this.listViewtest.SelectedItems[0].Index));
+               lv.SubItems.Add("");
+               lv.SubItems.Add("");
+               lv.SubItems.Add("");
+               lv.SubItems.Add("");
+               listViewtest.Items.Insert(this.listViewtest.SelectedItems[0].Index, lv);
+
+               for (int i = 0; i < listViewtest.Items.Count; i++)
+               {
+                   listViewtest.Items[i].SubItems[0].Text = String.Format("{0:d}", i);   //重新调整序号
+               }
+               RefreshParamState();
+           }
+          
+        }
+        /// <summary>
+        /// 参数导入--按钮的消息响应函数
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void inputbutton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofile = new OpenFileDialog();
+            ofile.Filter = "System Files(*.ini)|*.ini|所有文件(*.*)|*.*";
+            ofile.InitialDirectory = System.Environment.CurrentDirectory;
+            string savesysfilepath = @"";
+            if (ofile.ShowDialog() == DialogResult.OK)
+            {
+                if (ItemId < 9)
+                {
+                    listView1.Items.Clear();
+                    FileInfo f = new FileInfo(ofile.FileName);
+                    InputParam(f.FullName);
+                }
+                else if (ItemId == 9)
+                {
+                    listView2.Items.Clear();
+                    FileInfo f = new FileInfo(ofile.FileName);
+                    InputParam(f.FullName);
+                }
+                else if(ItemId == 10)
+                {
+                    listView3.Items.Clear();
+                    FileInfo f = new FileInfo(ofile.FileName);
+                    InputParam(f.FullName);
+                }
+
+            }
+            ofile.Dispose();
+        }
+        private void InputParam(string path)
+        {
+            if (ItemId == 5)
+                WriteReadAllFile.WriteReadYxYkYmIniFile(path, 0, 11);
+            else if (ItemId == 9)
+                WriteReadAllFile.WriteReadYxYkYmIniFile(path, 0, 18);
+            else if (ItemId == 10)
+                WriteReadAllFile.WriteReadYxYkYmIniFile(path, 0, 19);
+            CheckNowParamState();
+
+        }
+
+        private void ModifyMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ItemId < 9 || ItemId==11)
+            {
+                PublicDataClass._Mystruct.bpos = 0;
+                PublicDataClass._Mystruct.epos = listView1.Items.Count;
+                if (ItemId == 4 || ItemId == 5)
+                    PublicDataClass._Mystruct.bl = true;
+                else
+                    PublicDataClass._Mystruct.bl = false;
+                CModifyViewForm cfm = new CModifyViewForm();
+                cfm.ShowDialog();
+                if (cfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+                {
+                    for (int i = PublicDataClass._Mystruct.bpos; i <= PublicDataClass._Mystruct.epos; i++)
+                    {
+                        listView1.Items[i].SubItems[2].Text = Convert.ToString(PublicDataClass._Mystruct.value);   //重新调整序号
+
+                    }
+                    RefreshParamState();
+                }
+            }
+            else if (ItemId == 9)
+            {
+                PublicDataClass._MyYcDotstruct.bpos = 0;
+                PublicDataClass._MyYcDotstruct.epos = listView2.Items.Count;
+                CModifyViewForm1 cfm = new CModifyViewForm1();
+                cfm.ShowDialog();
+
+                if (cfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+                {
+                    for (int i = PublicDataClass._MyYcDotstruct.bpos; i <= PublicDataClass._MyYcDotstruct.epos; i++)
+                    {
+                        if (PublicDataClass._MyYcDotstruct.BusNum_notchange==false)
+                            listView2.Items[i].SubItems[2].Text = PublicDataClass._MyYcDotstruct.BusNum; 
+                        if (PublicDataClass._MyYcDotstruct.CardNum_notchange ==false)
+                            listView2.Items[i].SubItems[3].Text = PublicDataClass._MyYcDotstruct.CardNum;
+                        if (PublicDataClass._MyYcDotstruct.UBusmode_notchange == false)
+                            listView2.Items[i].SubItems[4].Text = PublicDataClass._MyYcDotstruct.UBusmode;
+                        if (PublicDataClass._MyYcDotstruct.IBusmode_notchange == false)
+                            listView2.Items[i].SubItems[5].Text = PublicDataClass._MyYcDotstruct.IBusmode;
+                    }
+                    RefreshParamState();
+                }
+            }
+            else if (ItemId == 10)
+            {
+                PublicDataClass._MyYcInformationstruct.bpos = 0;
+                PublicDataClass._MyYcInformationstruct.epos = listView3.Items.Count;
+                CModifyViewForm2 cfm = new CModifyViewForm2();
+                cfm.ShowDialog();
+
+                if (cfm.DialogResult == DialogResult.OK)               //判断是否按下-确定-按钮
+                {
+                    for (int i = PublicDataClass._MyYcInformationstruct.bpos; i <= PublicDataClass._MyYcInformationstruct.epos; i++)
+                    {
+                        if (PublicDataClass._MyYcInformationstruct.index_notchange == false)
+                        {
+                            if (PublicDataClass._MyYcInformationstruct.bl == true)
+                                listView3.Items[i].SubItems[2].Text = Convert.ToString(PublicDataClass._MyYcInformationstruct.index++);
+                            else
+                                listView3.Items[i].SubItems[2].Text = Convert.ToString(PublicDataClass._MyYcInformationstruct.index--);
+                        }
+                        if (PublicDataClass._MyYcInformationstruct.datatype_notchange == false)
+                            listView3.Items[i].SubItems[3].Text = PublicDataClass._MyYcInformationstruct.datatype;   //重新调整序号
+                        if (PublicDataClass._MyYcInformationstruct.magnification_notchange == false)
+                            listView3.Items[i].SubItems[4].Text = PublicDataClass._MyYcInformationstruct.magnification;
+                    }
+                    RefreshParamState();
+                }
+            }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked == true)
+                comboBoxaddr.Enabled = true;
+            else
+                comboBoxaddr.Enabled = false;
+            PublicDataClass.addselect = 0;
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+           /* if (comboBoxaddr.SelectedIndex == 0)
+                PublicDataClass._DataField.Buffer[0] = 0x00;
+            else if (comboBoxaddr.SelectedIndex == 1)
+                PublicDataClass._DataField.Buffer[0] = 0x01;
+            else if (comboBoxaddr.SelectedIndex == 2)
+                PublicDataClass._DataField.Buffer[0] = 0x02;
+            else if (comboBoxaddr.SelectedIndex == 3)
+                PublicDataClass._DataField.Buffer[0] = 0x03;
+            else if (comboBoxaddr.SelectedIndex == 4)
+                PublicDataClass._DataField.Buffer[0] = 0xff;*/
+
+            if (comboBoxaddr.SelectedIndex == 0)
+                PublicDataClass.addselect = 5;
+            else if (comboBoxaddr.SelectedIndex == 1)
+                PublicDataClass.addselect = 1;
+            else if (comboBoxaddr.SelectedIndex == 2)
+                PublicDataClass.addselect = 2;
+            else if (comboBoxaddr.SelectedIndex == 3)
+                PublicDataClass.addselect = 3;
+            else if (comboBoxaddr.SelectedIndex == 4)
+                PublicDataClass.addselect = 4;
+        
+        }
+
+       
+
+       
+
+        private void listView3_SubItemClicked(object sender, SubItemEventArgs e)
+        {
+            if (this.listView3.SelectedItems.Count == 0)
+                return;
+            if (e.SubItem < 2 ) // Password field
+            {
+                // the current value (text) of the subitem is ****, so we have to provide
+                // the control with the actual text (that's been saved in the item's Tag property)
+                return;
+            }
+            //if (ItemId < 4)
+            //    listView1.StartEditing(Editors[e.SubItem], e.Item, e.SubItem);
+            else
+            {
+                //if (Convert.ToInt16(this.listView1.SelectedItems[0].SubItems[2].Text) > 1)
+                //    ModifyFlag = true;
+                //else
+                //    ModifyFlag = false;
+                listView3.StartEditing(Editors[e.SubItem], e.Item, e.SubItem);
+            }
+
+        }
+
+
+        private void comboBoxvalue1_Leave(object sender, EventArgs e)
+        {
+            listView3.EndEditing(true);
+            RefreshParamState();
+        }
+
+        private void comboBoxvalue2_Leave(object sender, EventArgs e)
+        {
+            listView3.EndEditing(true);
+            RefreshParamState();
+        }
+
+        private void listView3_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.listView3.SelectedItems.Count == 0)
+                return;
+            foreach (ListViewItem item in this.listView3.Items)
+            {
+                item.ForeColor = SystemColors.WindowText;
+
+            }
+            this.listView3.SelectedItems[0].ForeColor = Color.Red;//设置当前选择项为红色
+        }
+
+        private void listView2_SubItemClicked(object sender, SubItemEventArgs e)
+        {
+            if (this.listView2.SelectedItems.Count == 0)
+                return;
+            if (e.SubItem < 2) // Password field
+            {
+                
+                return;
+            }
+
+            else if (e.SubItem < 6)
+            {
+               
+                listView2.StartEditing(Editors1[e.SubItem], e.Item, e.SubItem);
+            }
+        }
+
+        private void listView2_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.listView2.SelectedItems.Count == 0)
+                return;
+            foreach (ListViewItem item in this.listView2.Items)
+            {
+                item.ForeColor = SystemColors.WindowText;
+
+            }
+            this.listView2.SelectedItems[0].ForeColor = Color.Red;//设置当前选择项为红色
+        }
+
+        private void comboBoxvalue3_Leave(object sender, EventArgs e)
+        {
+            listView2.EndEditing(true);
+            RefreshParamState();
+        }
+
+        public void DynOptProcess()               //动态选项卡处理函数
+        {
+            if (this.tabControl1.Controls.Contains(tp_dottable))
+                this.tabControl1.Controls.Remove(tp_dottable);
+            for (int k = 0; k < PublicDataClass.FILENAME.Length; k++)
+            {
+                if (this.tabControl1.Controls.Contains(tp[k]))
+                    this.tabControl1.Controls.Remove(tp[k]);
+
+            }
+            if (PublicDataClass.SoftPageShowFlag == 1)
+            {
+
+                tp_dottable.Controls.Add(this.comboBoxvalue3);
+                tp_dottable.Controls.Add(this.listView2);
+                tp_dottable.Location = new System.Drawing.Point(4, 25);
+                tp_dottable.Name = "dottabPage";
+                tp_dottable.Padding = new System.Windows.Forms.Padding(3);
+                tp_dottable.Size = new System.Drawing.Size(769, 375);
+                tp_dottable.TabIndex = 8;
+                tp_dottable.Text = "点号表";
+                tp_dottable.UseVisualStyleBackColor = true;
+                tabControl1.Controls.Add(tp_dottable);
+            }
+
+            for (int k = 0; k < tp.Length; k++)
+            {
+                if (this.tabControl1.Controls.Contains(tp[k]))
+                    this.tabControl1.Controls.Remove(tp[k]);
+            }
+            if (PublicDataClass.FILENAME.Length > 0)
+            {
+                PublicDataClass.SoftPageShowFlag = 2;
+                PublicDataClass.TabCfg = new PublicDataClass.TabPageCfgParam[PublicDataClass.FILENAME.Length];//分配变量
+
+            }
+
+            if (PublicDataClass.SoftPageShowFlag == 2)
+            {
+                for (int k = 0; k < PublicDataClass.FILENAME.Length; k++)
+                {
+
+                    WriteReadAllFile.ReadDynOptFile(PublicDataClass.FILENAME[k], k, 1);
+                    // 针对数据库的字段名称，建立与之适应显示表头
+                    listViewtest.Items.Clear();
+                    listViewtest.Columns.Clear();
+                    for (int j = 0; j < PublicDataClass.TabCfg[k].ColumnNum; j++)
+                    {
+                        listViewtest.Columns.Add(PublicDataClass.TabCfg[k].ColumnPageName[j], 100, HorizontalAlignment.Center);//第一个参数，表头名，第2个参数，表头大小，第3个参数，样式    
+
+                    }
+
+                    for (int q = 0; q < PublicDataClass.TabCfg[k].LineNum; q++)
+                    {
+                        ListViewItem lv = new ListViewItem(PublicDataClass.TabCfg[k].TabPageValue[0].ValueTable[q]);
+                        for (int j = 0; j < PublicDataClass.TabCfg[k].ColumnNum - 1; j++)
+                        {
+
+                            lv.SubItems.Add(PublicDataClass.TabCfg[k].TabPageValue[j + 1].ValueTable[q]);
+                        }
+                        listViewtest.Items.Add(lv);
+                    }
+
+                    tp[k] = new TabPage();
+                    tp[k].Controls.Add(this.comboBoxvalue3);
+                    tp[k].Controls.Add(this.listViewtest);
+                    tp[k].Location = new System.Drawing.Point(4, 25);
+                    string str = String.Format("tp_{0:d}", k);
+                    tp[k].Name = str;
+                    tp[k].Padding = new System.Windows.Forms.Padding(3);
+                    tp[k].Size = new System.Drawing.Size(769, 375);
+                    tp[k].TabIndex = 10 + k;//待定
+                    tp[k].Text = PublicDataClass.TabCfg[k].PageName;
+                    tp[k].UseVisualStyleBackColor = true;
+                    tabControl1.Controls.Add(tp[k]);
+                }
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+            }
+
+
+
+        }
+
+        private void CheckNowDynOptParamState(int k)//更新动态选项卡参数
+        {
+            listViewtest.Items.Clear();
+            listViewtest.Columns.Clear();
+            listViewtest.Controls.Add(textBoxvalue);
+            for (int j = 0; j < PublicDataClass.TabCfg[k].ColumnNum; j++)
+            {
+
+                if (j == 1)
+                    listViewtest.Columns.Add(PublicDataClass.TabCfg[k].ColumnPageName[j], 200, HorizontalAlignment.Center);//第一个参数，表头名，第2个参数，表头大小，第3个参数，样式  
+                else
+                    listViewtest.Columns.Add(PublicDataClass.TabCfg[k].ColumnPageName[j], 100, HorizontalAlignment.Center);//第一个参数，表头名，第2个参数，表头大小，第3个参数，样式    
+            }
+
+            for (int q = 0; q < PublicDataClass.TabCfg[k].LineNum; q++)
+            {
+                ListViewItem lv = new ListViewItem(PublicDataClass.TabCfg[k].TabPageValue[0].ValueTable[q]);
+                for (int j = 0; j < PublicDataClass.TabCfg[k].ColumnNum - 1; j++)
+                {
+
+                    lv.SubItems.Add(PublicDataClass.TabCfg[k].TabPageValue[j + 1].ValueTable[q]);
+                }
+                listViewtest.Items.Add(lv);
+            }
+
+
+        }
+
+        private void listViewtest_SubItemClicked(object sender, SubItemEventArgs e)
+        {
+            listViewtest.StartEditing(Editors2[e.SubItem], e.Item, e.SubItem);
+        }
+
+        private void listViewtest_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.listViewtest.SelectedItems.Count == 0)
+                return;
+            foreach (ListViewItem item in this.listViewtest.Items)
+            {
+                item.ForeColor = SystemColors.WindowText;
+
+            }
+            this.listViewtest.SelectedItems[0].ForeColor = Color.Red;//设置当前选择项为红色
+        }
+
+     
+
+       
+
+      
+
+        
+    }
+}

@@ -1,0 +1,661 @@
+﻿namespace FaTestSoft
+{
+    partial class AcquisitionDocmentView
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.components = new System.ComponentModel.Container();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.InsertMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.AddMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.DeleteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ModifyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.comboBoxaddr = new System.Windows.Forms.ComboBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.inputbutton = new System.Windows.Forms.Button();
+            this.buttonsave = new System.Windows.Forms.Button();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.downloadbutton = new System.Windows.Forms.Button();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.comboBoxvalue2 = new System.Windows.Forms.ComboBox();
+            this.comboBoxvalue1 = new System.Windows.Forms.ComboBox();
+            this.textBoxvalue = new System.Windows.Forms.TextBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.tabPage7 = new System.Windows.Forms.TabPage();
+            this.tabPage8 = new System.Windows.Forms.TabPage();
+            this.listViewtest = new FaTestSoft.ListViewExtern(this.components);
+            this.tabPage9 = new System.Windows.Forms.TabPage();
+            this.comboBoxvalue3 = new System.Windows.Forms.ComboBox();
+            this.listView2 = new FaTestSoft.ListViewExtern(this.components);
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader9 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader13 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader14 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader15 = new System.Windows.Forms.ColumnHeader();
+            this.tabPage10 = new System.Windows.Forms.TabPage();
+            this.listView3 = new FaTestSoft.ListViewExtern(this.components);
+            this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader6 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader10 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader11 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader12 = new System.Windows.Forms.ColumnHeader();
+            this.listView1 = new FaTestSoft.ListViewExtern(this.components);
+            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader7 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader8 = new System.Windows.Forms.ColumnHeader();
+            this.tabPage11 = new System.Windows.Forms.TabPage();
+            this.contextMenuStrip1.SuspendLayout();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage8.SuspendLayout();
+            this.tabPage9.SuspendLayout();
+            this.tabPage10.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.InsertMenuItem,
+            this.AddMenuItem,
+            this.DeleteMenuItem,
+            this.ModifyMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(119, 92);
+            // 
+            // InsertMenuItem
+            // 
+            this.InsertMenuItem.Name = "InsertMenuItem";
+            this.InsertMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.InsertMenuItem.Text = "插入";
+            this.InsertMenuItem.Click += new System.EventHandler(this.InsertMenuItem_Click);
+            // 
+            // AddMenuItem
+            // 
+            this.AddMenuItem.Name = "AddMenuItem";
+            this.AddMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.AddMenuItem.Text = "添加";
+            this.AddMenuItem.Click += new System.EventHandler(this.AddMenuItem_Click);
+            // 
+            // DeleteMenuItem
+            // 
+            this.DeleteMenuItem.Name = "DeleteMenuItem";
+            this.DeleteMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.DeleteMenuItem.Text = "删除";
+            this.DeleteMenuItem.Click += new System.EventHandler(this.DeleteMenuItem_Click);
+            // 
+            // ModifyMenuItem
+            // 
+            this.ModifyMenuItem.Name = "ModifyMenuItem";
+            this.ModifyMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.ModifyMenuItem.Text = "批量修改";
+            this.ModifyMenuItem.Click += new System.EventHandler(this.ModifyMenuItem_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 1000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer1.IsSplitterFixed = true;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.comboBoxaddr);
+            this.splitContainer1.Panel1.Controls.Add(this.checkBox1);
+            this.splitContainer1.Panel1.Controls.Add(this.inputbutton);
+            this.splitContainer1.Panel1.Controls.Add(this.buttonsave);
+            this.splitContainer1.Panel1.Controls.Add(this.comboBox1);
+            this.splitContainer1.Panel1.Controls.Add(this.label1);
+            this.splitContainer1.Panel1.Controls.Add(this.downloadbutton);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
+            this.splitContainer1.Size = new System.Drawing.Size(793, 476);
+            this.splitContainer1.SplitterDistance = 63;
+            this.splitContainer1.TabIndex = 4;
+            // 
+            // comboBoxaddr
+            // 
+            this.comboBoxaddr.FormattingEnabled = true;
+            this.comboBoxaddr.Location = new System.Drawing.Point(693, 19);
+            this.comboBoxaddr.Name = "comboBoxaddr";
+            this.comboBoxaddr.Size = new System.Drawing.Size(87, 20);
+            this.comboBoxaddr.TabIndex = 7;
+            this.comboBoxaddr.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(615, 22);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(72, 16);
+            this.checkBox1.TabIndex = 6;
+            this.checkBox1.Text = "地址选择";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // inputbutton
+            // 
+            this.inputbutton.Location = new System.Drawing.Point(495, 16);
+            this.inputbutton.Name = "inputbutton";
+            this.inputbutton.Size = new System.Drawing.Size(81, 23);
+            this.inputbutton.TabIndex = 5;
+            this.inputbutton.Text = "导入(input)";
+            this.inputbutton.UseVisualStyleBackColor = true;
+            this.inputbutton.Click += new System.EventHandler(this.inputbutton_Click);
+            // 
+            // buttonsave
+            // 
+            this.buttonsave.Location = new System.Drawing.Point(399, 16);
+            this.buttonsave.Name = "buttonsave";
+            this.buttonsave.Size = new System.Drawing.Size(86, 23);
+            this.buttonsave.TabIndex = 4;
+            this.buttonsave.Text = "保存(save)";
+            this.buttonsave.UseVisualStyleBackColor = true;
+            this.buttonsave.Click += new System.EventHandler(this.buttonsave_Click);
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(78, 17);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(193, 20);
+            this.comboBox1.TabIndex = 1;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(19, 20);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(53, 12);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "测量点：";
+            // 
+            // downloadbutton
+            // 
+            this.downloadbutton.Location = new System.Drawing.Point(287, 15);
+            this.downloadbutton.Name = "downloadbutton";
+            this.downloadbutton.Size = new System.Drawing.Size(104, 23);
+            this.downloadbutton.TabIndex = 3;
+            this.downloadbutton.Text = "下载(download)";
+            this.downloadbutton.UseVisualStyleBackColor = true;
+            this.downloadbutton.Click += new System.EventHandler(this.downloadbutton_Click);
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage4);
+            this.tabControl1.Controls.Add(this.tabPage5);
+            this.tabControl1.Controls.Add(this.tabPage6);
+            this.tabControl1.Controls.Add(this.tabPage7);
+            this.tabControl1.Controls.Add(this.tabPage8);
+            this.tabControl1.Controls.Add(this.tabPage9);
+            this.tabControl1.Controls.Add(this.tabPage10);
+            this.tabControl1.Controls.Add(this.tabPage11);
+            this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tabControl1.Location = new System.Drawing.Point(3, 3);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(788, 404);
+            this.tabControl1.TabIndex = 2;
+            this.tabControl1.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl1_Selecting);
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.comboBoxvalue2);
+            this.tabPage1.Controls.Add(this.comboBoxvalue1);
+            this.tabPage1.Controls.Add(this.textBoxvalue);
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(780, 375);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "遥 测";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // comboBoxvalue2
+            // 
+            this.comboBoxvalue2.FormattingEnabled = true;
+            this.comboBoxvalue2.Items.AddRange(new object[] {
+            "不放大",
+            "10倍",
+            "100倍",
+            "100倍"});
+            this.comboBoxvalue2.Location = new System.Drawing.Point(434, 148);
+            this.comboBoxvalue2.Name = "comboBoxvalue2";
+            this.comboBoxvalue2.Size = new System.Drawing.Size(90, 24);
+            this.comboBoxvalue2.TabIndex = 9;
+            this.comboBoxvalue2.Visible = false;
+            this.comboBoxvalue2.Leave += new System.EventHandler(this.comboBoxvalue2_Leave);
+            // 
+            // comboBoxvalue1
+            // 
+            this.comboBoxvalue1.FormattingEnabled = true;
+            this.comboBoxvalue1.Items.AddRange(new object[] {
+            "整型",
+            "浮点型"});
+            this.comboBoxvalue1.Location = new System.Drawing.Point(297, 148);
+            this.comboBoxvalue1.Name = "comboBoxvalue1";
+            this.comboBoxvalue1.Size = new System.Drawing.Size(100, 24);
+            this.comboBoxvalue1.TabIndex = 8;
+            this.comboBoxvalue1.Visible = false;
+            this.comboBoxvalue1.Leave += new System.EventHandler(this.comboBoxvalue1_Leave);
+            // 
+            // textBoxvalue
+            // 
+            this.textBoxvalue.Location = new System.Drawing.Point(297, 110);
+            this.textBoxvalue.Name = "textBoxvalue";
+            this.textBoxvalue.Size = new System.Drawing.Size(100, 22);
+            this.textBoxvalue.TabIndex = 1;
+            this.textBoxvalue.Visible = false;
+            this.textBoxvalue.Leave += new System.EventHandler(this.textBoxvalue_Leave);
+            this.textBoxvalue.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxvalue_KeyPress);
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 25);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(780, 375);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "遥 信";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.Location = new System.Drawing.Point(4, 25);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(780, 375);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "遥 控";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.Location = new System.Drawing.Point(4, 25);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Size = new System.Drawing.Size(780, 375);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "遥信接入配置";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // tabPage5
+            // 
+            this.tabPage5.Location = new System.Drawing.Point(4, 25);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Size = new System.Drawing.Size(780, 375);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "遥测接入配置";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // tabPage6
+            // 
+            this.tabPage6.Location = new System.Drawing.Point(4, 25);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Size = new System.Drawing.Size(780, 375);
+            this.tabPage6.TabIndex = 5;
+            this.tabPage6.Text = "扰动越限";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // tabPage7
+            // 
+            this.tabPage7.Location = new System.Drawing.Point(4, 25);
+            this.tabPage7.Name = "tabPage7";
+            this.tabPage7.Size = new System.Drawing.Size(780, 375);
+            this.tabPage7.TabIndex = 6;
+            this.tabPage7.Text = "遥控逻辑配置";
+            this.tabPage7.UseVisualStyleBackColor = true;
+            // 
+            // tabPage8
+            // 
+            this.tabPage8.Controls.Add(this.listViewtest);
+            this.tabPage8.Location = new System.Drawing.Point(4, 25);
+            this.tabPage8.Name = "tabPage8";
+            this.tabPage8.Size = new System.Drawing.Size(780, 375);
+            this.tabPage8.TabIndex = 7;
+            this.tabPage8.Text = "采集器参数";
+            this.tabPage8.UseVisualStyleBackColor = true;
+            // 
+            // listViewtest
+            // 
+            this.listViewtest.AllowColumnReorder = true;
+            this.listViewtest.ContextMenuStrip = this.contextMenuStrip1;
+            this.listViewtest.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listViewtest.DoubleClickActivation = false;
+            this.listViewtest.FullRowSelect = true;
+            this.listViewtest.GridLines = true;
+            this.listViewtest.Location = new System.Drawing.Point(0, 0);
+            this.listViewtest.Name = "listViewtest";
+            this.listViewtest.Size = new System.Drawing.Size(780, 375);
+            this.listViewtest.TabIndex = 3;
+            this.listViewtest.UseCompatibleStateImageBehavior = false;
+            this.listViewtest.View = System.Windows.Forms.View.Details;
+            this.listViewtest.SubItemClicked += new FaTestSoft.SubItemEventHandler(this.listViewtest_SubItemClicked);
+            this.listViewtest.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listViewtest_MouseClick);
+            // 
+            // tabPage9
+            // 
+            this.tabPage9.Controls.Add(this.comboBoxvalue3);
+            this.tabPage9.Controls.Add(this.listView2);
+            this.tabPage9.Location = new System.Drawing.Point(4, 25);
+            this.tabPage9.Name = "tabPage9";
+            this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage9.Size = new System.Drawing.Size(780, 375);
+            this.tabPage9.TabIndex = 8;
+            this.tabPage9.Text = "点号表";
+            this.tabPage9.UseVisualStyleBackColor = true;
+            // 
+            // comboBoxvalue3
+            // 
+            this.comboBoxvalue3.FormattingEnabled = true;
+            this.comboBoxvalue3.Items.AddRange(new object[] {
+            "Y型",
+            "V型"});
+            this.comboBoxvalue3.Location = new System.Drawing.Point(204, 91);
+            this.comboBoxvalue3.Name = "comboBoxvalue3";
+            this.comboBoxvalue3.Size = new System.Drawing.Size(104, 24);
+            this.comboBoxvalue3.TabIndex = 1;
+            this.comboBoxvalue3.Visible = false;
+            this.comboBoxvalue3.Leave += new System.EventHandler(this.comboBoxvalue3_Leave);
+            // 
+            // listView2
+            // 
+            this.listView2.AllowColumnReorder = true;
+            this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader9,
+            this.columnHeader13,
+            this.columnHeader14,
+            this.columnHeader15});
+            this.listView2.ContextMenuStrip = this.contextMenuStrip1;
+            this.listView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView2.DoubleClickActivation = false;
+            this.listView2.FullRowSelect = true;
+            this.listView2.GridLines = true;
+            this.listView2.Location = new System.Drawing.Point(3, 3);
+            this.listView2.Name = "listView2";
+            this.listView2.Size = new System.Drawing.Size(774, 369);
+            this.listView2.TabIndex = 0;
+            this.listView2.UseCompatibleStateImageBehavior = false;
+            this.listView2.View = System.Windows.Forms.View.Details;
+            this.listView2.SubItemClicked += new FaTestSoft.SubItemEventHandler(this.listView2_SubItemClicked);
+            this.listView2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView2_MouseClick);
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "序号";
+            this.columnHeader3.Width = 100;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "名称";
+            this.columnHeader4.Width = 100;
+            // 
+            // columnHeader9
+            // 
+            this.columnHeader9.Text = "母线号";
+            this.columnHeader9.Width = 100;
+            // 
+            // columnHeader13
+            // 
+            this.columnHeader13.Text = "板卡号";
+            this.columnHeader13.Width = 100;
+            // 
+            // columnHeader14
+            // 
+            this.columnHeader14.Text = "电压母线接法";
+            this.columnHeader14.Width = 120;
+            // 
+            // columnHeader15
+            // 
+            this.columnHeader15.Text = "电流母线接法";
+            this.columnHeader15.Width = 120;
+            // 
+            // tabPage10
+            // 
+            this.tabPage10.Controls.Add(this.listView3);
+            this.tabPage10.Controls.Add(this.listView1);
+            this.tabPage10.Location = new System.Drawing.Point(4, 25);
+            this.tabPage10.Name = "tabPage10";
+            this.tabPage10.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage10.Size = new System.Drawing.Size(780, 375);
+            this.tabPage10.TabIndex = 9;
+            this.tabPage10.Text = "信息表";
+            this.tabPage10.UseVisualStyleBackColor = true;
+            // 
+            // listView3
+            // 
+            this.listView3.AllowColumnReorder = true;
+            this.listView3.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader5,
+            this.columnHeader6,
+            this.columnHeader10,
+            this.columnHeader11,
+            this.columnHeader12});
+            this.listView3.ContextMenuStrip = this.contextMenuStrip1;
+            this.listView3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView3.DoubleClickActivation = false;
+            this.listView3.FullRowSelect = true;
+            this.listView3.GridLines = true;
+            this.listView3.Location = new System.Drawing.Point(3, 3);
+            this.listView3.Name = "listView3";
+            this.listView3.Size = new System.Drawing.Size(774, 369);
+            this.listView3.TabIndex = 0;
+            this.listView3.UseCompatibleStateImageBehavior = false;
+            this.listView3.View = System.Windows.Forms.View.Details;
+            this.listView3.SubItemClicked += new FaTestSoft.SubItemEventHandler(this.listView3_SubItemClicked);
+            this.listView3.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView3_MouseClick);
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "序号";
+            this.columnHeader5.Width = 100;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Text = "名称";
+            this.columnHeader6.Width = 100;
+            // 
+            // columnHeader10
+            // 
+            this.columnHeader10.Text = "信息体索引号";
+            this.columnHeader10.Width = 120;
+            // 
+            // columnHeader11
+            // 
+            this.columnHeader11.Text = "数据类型";
+            this.columnHeader11.Width = 100;
+            // 
+            // columnHeader12
+            // 
+            this.columnHeader12.Text = "放大倍数";
+            this.columnHeader12.Width = 100;
+            // 
+            // listView1
+            // 
+            this.listView1.AllowColumnReorder = true;
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader7,
+            this.columnHeader8});
+            this.listView1.ContextMenuStrip = this.contextMenuStrip1;
+            this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView1.DoubleClickActivation = false;
+            this.listView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.listView1.FullRowSelect = true;
+            this.listView1.GridLines = true;
+            this.listView1.Location = new System.Drawing.Point(3, 3);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(774, 369);
+            this.listView1.TabIndex = 0;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
+            this.listView1.SubItemClicked += new FaTestSoft.SubItemEventHandler(this.listView1_SubItemClicked);
+            this.listView1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseClick);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "序号";
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "名称";
+            this.columnHeader2.Width = 300;
+            // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Text = "数值";
+            this.columnHeader7.Width = 100;
+            // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "字节";
+            // 
+            // tabPage11
+            // 
+            this.tabPage11.Location = new System.Drawing.Point(4, 25);
+            this.tabPage11.Name = "tabPage11";
+            this.tabPage11.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage11.Size = new System.Drawing.Size(780, 375);
+            this.tabPage11.TabIndex = 10;
+            this.tabPage11.Text = "遥信取反配置";
+            this.tabPage11.UseVisualStyleBackColor = true;
+            // 
+            // AcquisitionDocmentView
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.InactiveCaptionText;
+            this.ClientSize = new System.Drawing.Size(793, 476);
+            this.Controls.Add(this.splitContainer1);
+            this.DockAreas = ((KD.WinFormsUI.Docking.DockAreas)(((((KD.WinFormsUI.Docking.DockAreas.Float | KD.WinFormsUI.Docking.DockAreas.DockLeft)
+                        | KD.WinFormsUI.Docking.DockAreas.DockRight)
+                        | KD.WinFormsUI.Docking.DockAreas.DockTop)
+                        | KD.WinFormsUI.Docking.DockAreas.Document)));
+            this.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.HideOnClose = true;
+            this.Name = "AcquisitionDocmentView";
+            this.Text = "采集参数视图;";
+            this.Load += new System.EventHandler(this.AcquisitionDocmentView_Load);
+            this.Activated += new System.EventHandler(this.AcquisitionDocmentView_Activated);
+            this.contextMenuStrip1.ResumeLayout(false);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.PerformLayout();
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.tabPage8.ResumeLayout(false);
+            this.tabPage9.ResumeLayout(false);
+            this.tabPage10.ResumeLayout(false);
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.Button downloadbutton;
+        //private System.Windows.Forms.ListView listView1;
+        private ListViewExtern listView1;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem AddMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem DeleteMenuItem;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.ColumnHeader columnHeader7;
+        private System.Windows.Forms.ColumnHeader columnHeader8;
+        private System.Windows.Forms.TextBox textBoxvalue;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Button buttonsave;
+        private System.Windows.Forms.ToolStripMenuItem InsertMenuItem;
+        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.TabPage tabPage7;
+        private System.Windows.Forms.Button inputbutton;
+        private System.Windows.Forms.ToolStripMenuItem ModifyMenuItem;
+        private System.Windows.Forms.TabPage tabPage8;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.ComboBox comboBoxaddr;
+        private System.Windows.Forms.TabPage tabPage9;
+        private System.Windows.Forms.TabPage tabPage10;
+        private ListViewExtern listView3;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.ColumnHeader columnHeader10;
+        private System.Windows.Forms.ColumnHeader columnHeader11;
+        private System.Windows.Forms.ColumnHeader columnHeader12;
+        private ListViewExtern listView2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader columnHeader9;
+        private System.Windows.Forms.ComboBox comboBoxvalue1;
+        private System.Windows.Forms.ComboBox comboBoxvalue2;
+        private System.Windows.Forms.ColumnHeader columnHeader13;
+        private System.Windows.Forms.ColumnHeader columnHeader14;
+        private System.Windows.Forms.ColumnHeader columnHeader15;
+        private System.Windows.Forms.ComboBox comboBoxvalue3;
+        private System.Windows.Forms.TabPage tabPage11;
+        private ListViewExtern listViewtest;
+    }
+}

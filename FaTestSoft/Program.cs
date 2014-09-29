@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using FaTestSoft.INIT;                    //使用新增加的类所在的命名空间
+
+namespace FaTestSoft
+{
+    static class Program
+    {
+        /// <summary>
+        /// 应用程序的主入口点。
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+
+            InitGlobalData.InitAllGlobalVariables();               //初始化全局变量
+            //InitGlobalData.InitAllGlobalIniValue();                //初始化全局ini配置文件
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            //Application.Run(new Form1());
+            Application.Run(new Login());
+        }
+    }
+}

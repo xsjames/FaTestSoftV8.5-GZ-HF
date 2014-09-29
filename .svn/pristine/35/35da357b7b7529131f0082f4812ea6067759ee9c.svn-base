@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using FaTestSoft.CommonData;
+
+namespace FaTestSoft
+{
+    public partial class AddParamRecordViewForm1 : Form
+    {
+        public AddParamRecordViewForm1()
+        {
+            InitializeComponent();
+        }
+
+        private void AddParamRecordViewForm1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buttonok_Click(object sender, EventArgs e)
+        {
+            if (textBoxname.Text == "")
+            {
+                MessageBox.Show("名称记录项为空！", "提示",
+                  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (textBoxBusNum.Text == "")
+            {
+                MessageBox.Show("母线号记录项为空！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (textBoxCardNum.Text == "")
+            {
+                MessageBox.Show("板卡号记录项为空！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            PublicDataClass._AddYcDotParamRecord.Name = textBoxname.Text;
+            PublicDataClass._AddYcDotParamRecord.BusNum = textBoxBusNum.Text;
+            PublicDataClass._AddYcDotParamRecord.CardNum = textBoxCardNum.Text;
+            PublicDataClass._AddYcDotParamRecord.UBusConnectionmode = comboBoxUBusConnectionmode.Text;
+            PublicDataClass._AddYcDotParamRecord.IBusConnectionmode = comboBoxIBusConnectionmode.Text;
+
+            this.DialogResult = DialogResult.OK;
+        }
+
+        private void textBoxBusNum_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar != '\b')//这是允许输入退格键
+            {
+                if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                {
+
+                    MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void textBoxCardNum_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar != '\b')//这是允许输入退格键
+            {
+                if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                {
+
+                    MessageBox.Show("只能输入数字！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    e.Handled = true;
+                }
+            }
+        }
+    }
+}

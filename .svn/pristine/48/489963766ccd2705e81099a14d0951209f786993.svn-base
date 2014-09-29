@@ -1,0 +1,157 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using FaTestSoft.CommonData;              //使用新增加的类所在的命名空间
+
+namespace FaTestSoft
+{
+    namespace INIT
+    {
+        class InitGlobalData
+        {
+            /*************************************************************************
+                 *  函数名：    InitAllGlobalVariables                                   *
+                 *  功能  ：    初始化所有的全局变量                                     *
+                 *  参数  ：    无                                                       *
+                 *  返回值：    无                                                       *
+                 *  修改日期：  2010-11-09                                               *
+                 *  作者    ：  cuibj                                                    *
+                 * **********************************************************************/
+            public static void InitAllGlobalVariables()
+            {
+
+                PublicDataClass.PrjPath = @"";
+                PublicDataClass.PrjName = @"";
+
+            }
+            /*************************************************************************
+            *  函数名：    InitAllGlobalIniValue                                    *
+            *  功能  ：    初始化所有的ini变量                                      *
+            *  参数  ：    无                                                       *
+            *  返回值：    无                                                       *
+            *  修改日期：  2010-11-09                                               *
+            *  作者    ：  cuibj                                                    *
+            * **********************************************************************/
+            public static void InitAllGlobalIniValue()
+            {
+                string FileName = "";
+
+                string path = System.Environment.CurrentDirectory;
+                path += "\\ini";
+
+                for (byte i = 0; i < 21; i++)
+                {
+                    switch (i)
+                    {
+                        case 0:
+                            FileName = path + "\\yktable.ini";
+                            break;
+                        
+                        case 1:
+                            FileName = path + "\\ycname.ini";
+                            break;
+                        case 2:
+                            FileName = path + "\\yxname.ini";
+                            break;
+                        case 3:
+                            FileName = path + "\\ymname.ini";
+                            break;
+                        case 4:
+                            FileName = path + "\\Ycinfoaddr.ini";
+                            break;
+                        case 5:
+                            FileName = path + "\\Yxinfoaddr.ini";
+                            break;
+                        case 6:
+                            FileName = path + "\\Yminfoaddr.ini";
+                            break;
+
+                        case 7:
+                            FileName = path + "\\ycparam.ini";
+                            break;
+                        case 8:
+                            FileName = path + "\\yxparam.ini";
+                            break;
+                        case 9:
+                            FileName = path + "\\ykparam.ini";
+                            break;
+                        case 10:
+                            FileName = path + "\\yxlinecfgparam.ini";
+                            break;
+                        case 11:
+                            FileName = path + "\\yclinecfgparam.ini";
+                            break;
+                        case 12:
+                            FileName = path + "\\rdongparam.ini";
+                            break;
+                        case 13:
+                            FileName = path + "\\yxofinname.ini";
+                            break;
+                        case 14:
+                            FileName = path + "\\ychistroydataname.ini";
+                            break;
+                        case 15:
+                            FileName = path + "\\Tjhistroydataname.ini";
+                            break;
+                        case 16:
+                            FileName = path + "\\yklogicparam.ini";
+                            break;
+                        case 17:
+                            FileName = path + "\\meterparam.ini";
+                            break;
+                        case 18:
+                            FileName = path + "\\YcDotParam.ini";
+                            break;
+                        case 19:
+                            FileName = path + "\\YcInformationParam.ini";
+                            break;
+                        case 20:
+                            FileName = path + "\\yxdateqf.ini";
+                            break;
+                    }
+                    WriteReadAllFile.WriteReadYxYkYmIniFile(FileName, 0, i);
+                }
+
+                for (byte i = 0; i < 11; i++)
+                {
+                    switch (i)
+                    {
+                        case 0:
+                            FileName = path + "\\netparam.ini";
+                            break;
+                        case 1:
+                            FileName = path + "\\comparam.ini";
+                            break;
+                        case 2:
+                            FileName = path + "\\sysparam.ini";
+                            break;
+                        case 4:
+                            FileName = path + "\\gprsparam.ini";
+                            break;
+                        case 5:
+                            FileName = path + "\\protocol.ini";
+                            break;
+                        case 6:
+                            FileName = path + "\\baudrate.ini";
+                            break;
+                        case 7:
+                            FileName = path + "\\port.ini";
+                            break;
+                        case 8:
+                            FileName = path + "\\runparam.ini";
+                            break;
+                        case 9:
+                            FileName = path + "\\protectparam.ini";
+                            break;
+                        case 10:
+                            FileName = path + "\\funcconfigparam .ini";
+                            break;
+
+                    }
+                    WriteReadAllFile.WriteReadSysIniFile(FileName, 0, i);
+                }
+            }
+        }
+    }
+}
